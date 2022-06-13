@@ -12,9 +12,9 @@ class DefaultShellAdapter implements IShellExecutor
         $processArgs = array_merge($processArgs, $args);
 
         $process = new Process($processArgs);
-        $process->run();
-        $output = $process->getOutput();
+        $process->setTimeout(100000);
+        $process->mustRun();
 
-        dd($output);
+        return $process->getOutput();
     }
 }

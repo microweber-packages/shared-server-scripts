@@ -11,7 +11,7 @@ class MicroweberDownloader implements IMicroweberDownloader {
 
     public function setReleaseSource($source)
     {
-        $this->setReleaseSource($source);
+        $this->realeaseSource = $source;
     }
 
     public function download(string $target)
@@ -28,9 +28,18 @@ class MicroweberDownloader implements IMicroweberDownloader {
             throw new Exception('No releases found.');
         }
 
+        $mainAppDownloadingErrors = [];
         $status = $this->downloadMainApp($release['url'], $target);
-
-        var_dump($status);
+        if (is_dir($target)) {
+            $mainAppDownloadingErrors[] = true;
+        }
+        if (is_file($target . DIRECTORY_SEPARATOR . 'index.php')) {
+            $mainAppDownloadingErrors[] = true;
+        }
+        if (!empty($mainAppDownloadingErrors)) {
+            throw new Exception('Error when downloading the main app.');
+        }
+        
     }
 
     public function downloadMainApp($url, $target)
