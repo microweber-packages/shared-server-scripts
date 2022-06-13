@@ -10,13 +10,15 @@ class MicroweberDownloaderTest extends TestCase
 {
     public function testDownload()
     {
-        $downloader = new MicroweberDownloader(NativeFileManager::class,NativeShellExecutor::class);
-        $status = $downloader->download(__DIR__.'/microweber-latest');
+        $downloadTargetPath = dirname(__DIR__).'/temp/microweber-latest/';
 
-        $this->assertTrue(is_dir(__DIR__.'/microweber-latest'));
-        $this->assertTrue(is_dir(__DIR__.'/microweber-latest/vendor'));
-        $this->assertTrue(is_dir(__DIR__.'/microweber-latest/userfiles'));
-        $this->assertTrue(is_file(__DIR__.'/microweber-latest/index.php'));
+        $downloader = new MicroweberDownloader(NativeFileManager::class, NativeShellExecutor::class);
+        $status = $downloader->download($downloadTargetPath);
+
+        $this->assertTrue(is_dir($downloadTargetPath));
+        $this->assertTrue(is_dir($downloadTargetPath.'/vendor'));
+        $this->assertTrue(is_dir($downloadTargetPath.'/userfiles'));
+        $this->assertTrue(is_file($downloadTargetPath.'/index.php'));
     }
 
 }

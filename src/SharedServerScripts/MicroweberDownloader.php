@@ -83,6 +83,7 @@ class MicroweberDownloader implements IMicroweberDownloader {
         if ($this->fileManager->isFile($target . DIRECTORY_SEPARATOR . 'index.php')) {
             $mainAppDownloadingErrors[] = true;
         }
+
         if (!empty($mainAppDownloadingErrors)) {
             throw new \Exception('Error when downloading the main app. Reason: ' . $status);
         }
