@@ -3,7 +3,7 @@
 
 namespace SharedServerScripts;
 
-class MicroweberWhitelabelUpdate {
+class MicroweberWhitelabelUpdater {
   
   
   
