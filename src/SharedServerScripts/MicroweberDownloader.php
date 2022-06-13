@@ -5,6 +5,7 @@ use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManage
 use MicroweberPackages\SharedServerScripts\Interfaces\IMicroweberDownloader;
 use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 use MicroweberPackages\SharedServerScripts\Shell\ShellExecutor;
+use function Livewire\str;
 
 class MicroweberDownloader implements IMicroweberDownloader {
 
@@ -71,7 +72,6 @@ class MicroweberDownloader implements IMicroweberDownloader {
             throw new \Exception('No releases found.');
         }
 
-
         // Download the app
         $status = $this->downloadMainApp($release['url'], $target);
 
@@ -87,7 +87,11 @@ class MicroweberDownloader implements IMicroweberDownloader {
             throw new \Exception('Error when downloading the main app.');
         }
 
-        return ['downloaded'=>true];
+        if (strpos($status, 'Done') !== false) {
+            return ['downloaded'=>true];
+        }
+
+        throw new \Exception('Something went wrong when downloading the main app.');
     }
 
     /**
