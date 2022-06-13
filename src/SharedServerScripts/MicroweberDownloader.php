@@ -42,12 +42,12 @@ class MicroweberDownloader implements IMicroweberDownloader {
     public function download(string $target)
     {
         // Validate target path
-        if (!$this->fileManager->isDir($target)) {
-            throw new \Exception('Target path is not valid.');
+        if (!$this->fileManager->isDir(dirname($target))) {
+            throw new \Exception('Parent folder of target path is not valid.');
         }
 
-        if (!$this->fileManager->isWritable($target)) {
-            throw new \Exception('Target path is not writable.');
+        if (!$this->fileManager->isWritable(dirname($target))) {
+            throw new \Exception('Parent folder of target path is not writable.');
         }
 
         // Get latest release of app
@@ -72,6 +72,7 @@ class MicroweberDownloader implements IMicroweberDownloader {
             throw new \Exception('Error when downloading the main app.');
         }
 
+        return ['downloaded'=>true];
     }
 
     /**
