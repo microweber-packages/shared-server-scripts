@@ -16,7 +16,8 @@ class MicroweberSharedPathHelper
     /**
      * @param $fileManagerAdapter
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->fileManager = new NativeFileManager();
     }
 
@@ -27,6 +28,31 @@ class MicroweberSharedPathHelper
     public function setPath($path)
     {
         $this->path = $path;
+    }
+
+    public function getCurrentVersion()
+    {
+        $versionFile = $this->fileManager->fileExists($this->path . '/version.txt');
+
+        $version = 'unknown';
+        if ($versionFile) {
+            $version = $this->fileManager->fileGetContents($this->path . '/version.txt');
+            $version = strip_tags($version);
+        }
+
+        return $version;
+    }
+
+    public function getLastDownloadDate()
+    {
+        $versionFile = $this->fileManager->fileExists($this->path . '/version.txt');
+
+        $date = 'unknown';
+        if ($versionFile) {
+            $date = date('Y-m-d- H:i:s', $this->fileManager->filemtime($this->path . '/version.txt'));
+        }
+
+        return $date;
     }
 
     /**
@@ -40,15 +66,24 @@ class MicroweberSharedPathHelper
         if ($this->fileManager->fileExists($templatesPath)) {
             $listDir = $this->fileManager->scanDir($templatesPath, true);
             foreach ($listDir as $file) {
-                if($file === '.' || $file === '..') {
+                if ($file === '.' || $file === '..') {
                     continue;
                 }
                 $upperText = $file;
                 $upperText = ucfirst($upperText);
-                $templates[trim($file)] = $upperText;
+
+                $templates[] = [
+                    'targetDir' => trim($file),
+                    'version' => '0.0',
+                    'name' => $upperText
+                ];
             }
         } else {
-            $templates['Default'] = 'Default';
+            $templates[] = [
+                'targetDir' => 'default',
+                'version' => '0.0',
+                'name' => 'Default'
+            ];
         }
 
         asort($templates);
