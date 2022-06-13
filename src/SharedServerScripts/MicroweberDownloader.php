@@ -43,6 +43,15 @@ class MicroweberDownloader implements IMicroweberDownloader {
     }
 
     /**
+     * @param $adapter
+     * @return void
+     */
+    public function setShellExecutor($adapter)
+    {
+        $this->shellExecutor = $adapter;
+    }
+
+    /**
      * @param $source
      * @return void
      */

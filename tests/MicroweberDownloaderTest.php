@@ -2,6 +2,8 @@
 
 namespace MicroweberPackages\SharedServerScripts;
 
+use MicroweberPackages\SharedServerScripts\FileManager\Adapters\PleskFileManager;
+use MicroweberPackages\SharedServerScripts\Shell\Adapters\PleskShellExecutor;
 use PHPUnit\Framework\TestCase;
 use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
 use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
@@ -14,7 +16,10 @@ class MicroweberDownloaderTest extends TestCase
 
         $downloadTargetPath = dirname(__DIR__).'/temp/microweber-latest/';
 
-        $downloader = new MicroweberDownloader(NativeFileManager::class, NativeShellExecutor::class);
+        $downloader = new MicroweberDownloader();
+        $downloader->setFileManager(PleskFileManager::class);
+        $downloader->setShellExecutor(PleskShellExecutor::class);
+
         $status = $downloader->download($downloadTargetPath);
 
         $this->assertTrue(is_dir($downloadTargetPath));
