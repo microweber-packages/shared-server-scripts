@@ -7,51 +7,84 @@ use MicroweberPackages\SharedServerScripts\Shell\ShellExecutor;
 
 class MicroweberDownloader implements IMicroweberDownloader {
 
+    public $fileManager;
+    public $shellExecutor;
     public $realeaseSource = 'dev';
 
+    /**
+     * @param $fileManagerAdapter
+     * @param $shellExecutorAdapter
+     */
+    public function __construct($fileManagerAdapter, $shellExecutorAdapter) {
+        $this->fileManager = new $fileManagerAdapter();
+        $this->shellExecutor = new $shellExecutorAdapter();
+    }
+
+    /**
+     * @param $source
+     * @return void
+     */
     public function setReleaseSource($source)
     {
         $this->realeaseSource = $source;
     }
 
+    /**
+     * @param string $target
+     * @return void
+     */
     public function download(string $target)
     {
-        if (!is_dir($target)) {
+        // Validate target path
+        if (!$this->fileManager->isDir($target)) {
             throw new Exception('Target path is not valid.');
         }
-        if (!is_writable($target)) {
+
+        if (!$this->fileManager->isWritable($target)) {
             throw new Exception('Target path is not writable.');
         }
 
+        // Get latest release of app
         $release = $this->getRelease();
         if (empty($release)) {
             throw new Exception('No releases found.');
         }
 
-        $mainAppDownloadingErrors = [];
+
+        // Download the app
         $status = $this->downloadMainApp($release['url'], $target);
-        if (is_dir($target)) {
+
+        // Validate app installation
+        $mainAppDownloadingErrors = [];
+        if ($this->fileManager->isDir($target)) {
             $mainAppDownloadingErrors[] = true;
         }
-        if (is_file($target . DIRECTORY_SEPARATOR . 'index.php')) {
+        if ($this->fileManager->isFile($target . DIRECTORY_SEPARATOR . 'index.php')) {
             $mainAppDownloadingErrors[] = true;
         }
         if (!empty($mainAppDownloadingErrors)) {
             throw new Exception('Error when downloading the main app.');
         }
-        
+
     }
 
+    /**
+     * @param $url
+     * @param $target
+     * @return string
+     */
     public function downloadMainApp($url, $target)
     {
-        $shellExecutor = new ShellExecutor();
-        $status = $shellExecutor->executeFile(dirname(dirname(__DIR__))
+        $status = $this->shellExecutor->executeFile(dirname(dirname(__DIR__))
             . DIRECTORY_SEPARATOR . 'shell-scripts'
             . DIRECTORY_SEPARATOR . 'unzip_app_version.sh', [base64_encode($url), $target]);
 
         return $status;
     }
 
+    /**
+     * @return string[]
+     */
     public function getRelease()
     {
         if ($this->realeaseSource == 'dev') {
