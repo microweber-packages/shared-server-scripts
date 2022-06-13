@@ -22,4 +22,13 @@ class NativeFileManager implements IFileManager
         return is_writable($dir);
     }
 
+    /**
+     * @param $dir
+     * @return bool
+     */
+    public function isFile($dir)
+    {
+        return is_file($dir);
+    }
+
 }
