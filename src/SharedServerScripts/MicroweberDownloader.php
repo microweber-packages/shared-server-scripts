@@ -84,14 +84,14 @@ class MicroweberDownloader implements IMicroweberDownloader {
             $mainAppDownloadingErrors[] = true;
         }
         if (!empty($mainAppDownloadingErrors)) {
-            throw new \Exception('Error when downloading the main app.');
+            throw new \Exception('Error when downloading the main app. Reason: ' . $status);
         }
 
         if (strpos($status, 'Done') !== false) {
             return ['downloaded'=>true];
         }
 
-        throw new \Exception('Something went wrong when downloading the main app.');
+        throw new \Exception('Something went wrong when downloading the main app. Reason: ' . $status);
     }
 
     /**
