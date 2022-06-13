@@ -21,6 +21,18 @@ class MicroweberSharedPathHelper
         $this->fileManager = new NativeFileManager();
     }
 
+    /**
+     * @param $path
+     * @return void
+     */
+    public function setPath($path)
+    {
+        $this->path = $path;
+    }
+
+    /**
+     * @return array
+     */
     public function getSupportedTemplates()
     {
         $templates = [];
@@ -42,6 +54,9 @@ class MicroweberSharedPathHelper
         return $templates;
     }
 
+    /**
+     * @return array
+     */
     public function getSupportedLanguages()
     {
         $languages = [];
