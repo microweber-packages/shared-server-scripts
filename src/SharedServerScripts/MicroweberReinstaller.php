@@ -1,6 +1,6 @@
 <?php
+namespace MicroweberPackages\SharedServerScripts;
 
-namespace SharedServerScripts;
 
 class MicroweberReinstaller {
   
