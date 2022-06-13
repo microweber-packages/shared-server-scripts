@@ -1,7 +1,7 @@
 
 <?php
 
-namespace SharedServerScripts;
+namespace MicroweberPackages\SharedServerScripts;
 
 class MicroweberWhitelabelUpdater {
   
