@@ -2,9 +2,9 @@
 
 namespace MicroweberPackages\SharedServerScripts;
 
-use MicroweberPackages\SharedServerScripts\Files\Adapters\DefaultFileAdapter;
-use MicroweberPackages\SharedServerScripts\Shell\Adapters\DefaultShellAdapter;
 use PHPUnit\Framework\TestCase;
+use MicroweberPackages\SharedServerScripts\FileManager\Adapters\DefaultFileAdapter;
+use MicroweberPackages\SharedServerScripts\Shell\Adapters\DefaultShellAdapter;
 
 class MicroweberDownloaderTest extends TestCase
 {

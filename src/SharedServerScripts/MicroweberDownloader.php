@@ -1,8 +1,9 @@
 <?php
-
 namespace MicroweberPackages\SharedServerScripts;
 
+use MicroweberPackages\SharedServerScripts\FileManager\Adapters\DefaultFileAdapter;
 use MicroweberPackages\SharedServerScripts\Interfaces\IMicroweberDownloader;
+use MicroweberPackages\SharedServerScripts\Shell\Adapters\DefaultShellAdapter;
 use MicroweberPackages\SharedServerScripts\Shell\ShellExecutor;
 
 class MicroweberDownloader implements IMicroweberDownloader {
@@ -15,9 +16,14 @@ class MicroweberDownloader implements IMicroweberDownloader {
      * @param $fileManagerAdapter
      * @param $shellExecutorAdapter
      */
-    public function __construct($fileManagerAdapter, $shellExecutorAdapter) {
-        $this->fileManager = new $fileManagerAdapter();
-        $this->shellExecutor = new $shellExecutorAdapter();
+    public function __construct() {
+        $this->fileManager = new DefaultFileAdapter();
+        $this->shellExecutor = new DefaultShellAdapter();
+    }
+
+    public function setFileManager($adapter)
+    {
+        $this->fileManager = $adapter;
     }
 
     /**
@@ -37,17 +43,17 @@ class MicroweberDownloader implements IMicroweberDownloader {
     {
         // Validate target path
         if (!$this->fileManager->isDir($target)) {
-            throw new Exception('Target path is not valid.');
+            throw new \Exception('Target path is not valid.');
         }
 
         if (!$this->fileManager->isWritable($target)) {
-            throw new Exception('Target path is not writable.');
+            throw new \Exception('Target path is not writable.');
         }
 
         // Get latest release of app
         $release = $this->getRelease();
         if (empty($release)) {
-            throw new Exception('No releases found.');
+            throw new \Exception('No releases found.');
         }
 
 
@@ -63,7 +69,7 @@ class MicroweberDownloader implements IMicroweberDownloader {
             $mainAppDownloadingErrors[] = true;
         }
         if (!empty($mainAppDownloadingErrors)) {
-            throw new Exception('Error when downloading the main app.');
+            throw new \Exception('Error when downloading the main app.');
         }
 
     }
