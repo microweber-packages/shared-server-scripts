@@ -37,9 +37,17 @@ class NativeFileManager implements IFileManager
      */
     public function fileExtension($path)
     {
-        $ext = pathinfo($path, PATHINFO_EXTENSION);
+        return pathinfo($path, PATHINFO_EXTENSION);
+    }
 
-        return $ext;
+    public function fileExists($file)
+    {
+        return file_exists($file);
+    }
+
+    public function scanDir($dir)
+    {
+        return scandir($dir);
     }
 
 }

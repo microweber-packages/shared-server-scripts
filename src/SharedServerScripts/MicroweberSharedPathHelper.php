@@ -3,7 +3,6 @@
 namespace MicroweberPackages\SharedServerScripts;
 
 use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
-use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 
 class MicroweberSharedPathHelper
 {
@@ -36,7 +35,7 @@ class MicroweberSharedPathHelper
     public function getSupportedTemplates()
     {
         $templates = [];
-        $templatesPath = $this->path . 'userfiles/templates/';
+        $templatesPath = $this->path . '/userfiles/templates/';
 
         if ($this->fileManager->fileExists($templatesPath)) {
             $listDir = $this->fileManager->scanDir($templatesPath, true);
@@ -61,7 +60,7 @@ class MicroweberSharedPathHelper
     {
         $languages = [];
 
-        $languagesPath = $this->path . 'userfiles/modules/microweber/language';
+        $languagesPath = $this->path . '/userfiles/modules/microweber/language';
 
         if ($this->fileManager->fileExists($languagesPath)) {
             $listDir = $this->fileManager->scandir($languagesPath, true);
