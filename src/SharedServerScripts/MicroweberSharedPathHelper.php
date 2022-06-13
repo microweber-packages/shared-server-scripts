@@ -40,6 +40,9 @@ class MicroweberSharedPathHelper
         if ($this->fileManager->fileExists($templatesPath)) {
             $listDir = $this->fileManager->scanDir($templatesPath, true);
             foreach ($listDir as $file) {
+                if($file === '.' || $file === '..') {
+                    continue;
+                }
                 $upperText = $file;
                 $upperText = ucfirst($upperText);
                 $templates[trim($file)] = $upperText;
