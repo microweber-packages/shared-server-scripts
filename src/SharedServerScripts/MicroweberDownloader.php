@@ -3,6 +3,7 @@
 namespace MicroweberPackages\SharedServerScripts;
 
 use MicroweberPackages\SharedServerScripts\Interfaces\IMicroweberDownloader;
+use MicroweberPackages\SharedServerScripts\Shell\ShellExecutor;
 
 class MicroweberDownloader implements IMicroweberDownloader {
 
@@ -15,7 +16,10 @@ class MicroweberDownloader implements IMicroweberDownloader {
             throw new Exception('Target path is not writable.');
         }
 
-        dump($target);
+      //  $shellExecutor = new ShellExecutor();
+    //    $status = $shellExecutor->executeFile('unzip_app_version.sh', ['', $target]);
+
+       // dd($status);
     }
 
     public function getRelease()

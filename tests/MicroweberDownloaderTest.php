@@ -10,7 +10,7 @@ class MicroweberDownloaderTest extends TestCase
     {
 
         $downloader = new MicroweberDownloader();
-        $downloader->download(__DIR__);
+        $downloader->download(__DIR__.'/vai');
 
     }
 
