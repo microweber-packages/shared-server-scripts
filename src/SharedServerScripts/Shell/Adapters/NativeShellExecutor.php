@@ -3,8 +3,13 @@ namespace MicroweberPackages\SharedServerScripts\Shell\Adapters;
 
 use Symfony\Component\Process\Process;
 
-class DefaultShellAdapter implements IShellExecutor
+class NativeShellExecutor implements IShellExecutor
 {
+    /**
+     * @param string $file
+     * @param array $args
+     * @return mixed|string
+     */
     public function executeFile(string $file, array $args)
     {
         $processArgs = [];

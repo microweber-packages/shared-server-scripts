@@ -1,15 +1,26 @@
 <?php
 namespace MicroweberPackages\SharedServerScripts;
 
-use MicroweberPackages\SharedServerScripts\FileManager\Adapters\DefaultFileAdapter;
+use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
 use MicroweberPackages\SharedServerScripts\Interfaces\IMicroweberDownloader;
-use MicroweberPackages\SharedServerScripts\Shell\Adapters\DefaultShellAdapter;
+use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 use MicroweberPackages\SharedServerScripts\Shell\ShellExecutor;
 
 class MicroweberDownloader implements IMicroweberDownloader {
 
+    /**
+     * @var NativeFileManager
+     */
     public $fileManager;
+
+    /**
+     * @var NativeShellExecutor
+     */
     public $shellExecutor;
+
+    /**
+     * @var string
+     */
     public $realeaseSource = 'dev';
 
     /**
@@ -17,10 +28,14 @@ class MicroweberDownloader implements IMicroweberDownloader {
      * @param $shellExecutorAdapter
      */
     public function __construct() {
-        $this->fileManager = new DefaultFileAdapter();
-        $this->shellExecutor = new DefaultShellAdapter();
+        $this->fileManager = new NativeFileManager();
+        $this->shellExecutor = new NativeShellExecutor();
     }
 
+    /**
+     * @param $adapter
+     * @return void
+     */
     public function setFileManager($adapter)
     {
         $this->fileManager = $adapter;
