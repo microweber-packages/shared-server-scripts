@@ -10,6 +10,8 @@ class MicroweberDownloaderTest extends TestCase
 {
     public function testDownload()
     {
+        mkdir_recursive(dirname(__DIR__).'/temp');
+
         $downloadTargetPath = dirname(__DIR__).'/temp/microweber-latest/';
 
         $downloader = new MicroweberDownloader(NativeFileManager::class, NativeShellExecutor::class);
