@@ -72,9 +72,23 @@ class MicroweberSharedPathHelper
                 $upperText = $file;
                 $upperText = ucfirst($upperText);
 
+                // Read config from template path
+                $config = false;
+                $sourceTemplateVersion = false;
+                $sourceTemplateConfig = false;
+                // Check for config file
+                $templateFolderPathConfig = $templatesPath . $file.DIRECTORY_SEPARATOR.'config.php';
+                if (is_file($templateFolderPathConfig)) {
+                    include $templateFolderPathConfig;
+                    $sourceTemplateConfig = $config;
+                }
+                if (isset($sourceTemplateConfig['version'])) {
+                    $sourceTemplateVersion = $sourceTemplateConfig['version'];
+                }
+
                 $templates[] = [
                     'targetDir' => trim($file),
-                    'version' => '0.0',
+                    'version' => $sourceTemplateVersion,
                     'name' => $upperText
                 ];
             }
