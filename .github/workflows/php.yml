@@ -17,7 +17,7 @@ jobs:
     - name: Install dependencies
       run: composer install --prefer-dist --no-progress
 
-    - name: Run test suite
+    - name: Run unit test
       run: ./vendor/bin/phpunit
 
     - name: Run unit test to installed microweber from shared scripts
