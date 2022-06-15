@@ -23,5 +23,6 @@ jobs:
     - name: Run unit test to installed microweber from shared scripts
       run:
         |
-        cd /temp/my-microweber-installation
+        ls
+        cd /temp/my-microweber-installation/
         php artisan test
