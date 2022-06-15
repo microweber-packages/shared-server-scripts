@@ -12,7 +12,7 @@ class MicroweberDownloaderTest extends TestCase
 {
     public function testDownload()
     {
-        
+
         $temp = dirname(__DIR__).'/temp';
         if (!is_dir($temp)) {
             mkdir($temp);

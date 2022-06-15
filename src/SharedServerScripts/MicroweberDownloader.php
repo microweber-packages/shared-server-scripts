@@ -101,10 +101,10 @@ class MicroweberDownloader implements IMicroweberDownloader {
 
         // Validate app installation
         $mainAppDownloadingErrors = [];
-        if ($this->fileManager->isDir($target)) {
+        if (!$this->fileManager->isDir($target)) {
             $mainAppDownloadingErrors[] = true;
         }
-        if ($this->fileManager->isFile($target . DIRECTORY_SEPARATOR . 'index.php')) {
+        if (!$this->fileManager->isFile($target . DIRECTORY_SEPARATOR . 'index.php')) {
             $mainAppDownloadingErrors[] = true;
         }
 
