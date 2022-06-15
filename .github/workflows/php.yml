@@ -21,10 +21,4 @@ jobs:
       run: ./vendor/bin/phpunit
 
     - name: Run unit test to installed microweber from shared scripts
-      run:
-        |
-        ls
-        cd ./temp
-        ls
-        cd ./temp/my-microweber-installation
-        php artisan test
+      run: ./temp/my-microweber-installation/php artisan test
