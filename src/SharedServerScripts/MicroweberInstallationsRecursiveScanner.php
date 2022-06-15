@@ -6,6 +6,9 @@ use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManage
 
 class MicroweberInstallationsRecursiveScanner
 {
+    /**
+     * @var
+     */
     public $path;
 
     /**
@@ -30,6 +33,9 @@ class MicroweberInstallationsRecursiveScanner
         $this->path = $path;
     }
 
+    /**
+     * @return array
+     */
     public function scan()
     {
         $installations = [];

@@ -6,6 +6,9 @@ use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManage
 
 class MicroweberAppPathHelper
 {
+    /**
+     * @var
+     */
     public $path;
 
     /**
@@ -30,11 +33,17 @@ class MicroweberAppPathHelper
         $this->path = $path;
     }
 
+    /**
+     * @return bool
+     */
     public function isSymlink()
     {
         return $this->fileManager->isLink($this->path.'/vendor');
     }
 
+    /**
+     * @return bool
+     */
     public function isInstalled()
     {
         $configFile = $this->path . '/config/microweber.php';
@@ -45,6 +54,9 @@ class MicroweberAppPathHelper
         return false;
     }
 
+    /**
+     * @return false|string
+     */
     public function getCreatedAt()
     {
         $configFile = $this->path . '/config/app.php';
@@ -55,6 +67,9 @@ class MicroweberAppPathHelper
         return false;
     }
 
+    /**
+     * @return string
+     */
     public function getCurrentVersion()
     {
         $versionFile = $this->fileManager->fileExists($this->path . '/version.txt');
@@ -144,9 +159,7 @@ class MicroweberAppPathHelper
         }
 
         asort($languages);
-
         return $languages;
-
     }
 
 
