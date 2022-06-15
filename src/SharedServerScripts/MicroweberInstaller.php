@@ -2,18 +2,26 @@
 
 namespace MicroweberPackages\SharedServerScripts;
 
+use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
+use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 
 class MicroweberInstaller {
 
-    /**
-     * @var string
-     */
-    protected $type = 'standalone';
+    public const TYPE_STANDALONE = 'standalone';
+    public const TYPE_SYMLINK = 'symlink';
+
+    public const DATABASE_DRIVER_MYSQL = 'mysql';
+    public const DATABASE_DRIVER_SQLITE = 'sqlite';
 
     /**
      * @var string
      */
-    protected $databaseDriver = 'sqlite';
+    protected $type = self::TYPE_STANDALONE;
+
+    /**
+     * @var string
+     */
+    protected $databaseDriver = self::DATABASE_DRIVER_SQLITE;
 
     /**
      * @var string
@@ -73,6 +81,14 @@ class MicroweberInstaller {
     }
 
     /**
+     * @param $path
+     * @return void
+     */
+    public function setSourcePath($path) {
+        $this->sourcePath = $path;
+    }
+
+    /**
      * @param $type
      * @return void
      */
@@ -128,17 +144,27 @@ class MicroweberInstaller {
         $this->adminPassword = $password;
     }
 
-    private function _generateIniFile($array, $i = 0) {
-        $str = "";
-        foreach ($array as $k => $v) {
-            if (is_array($v)) {
-                $str .= str_repeat(" ",$i*2)."[$k]".PHP_EOL;
-                $str .= $this->_generateIniFile($v, $i+1);
-            } else {
-                $str .= str_repeat(" ", $i * 2) . "$k = $v" . PHP_EOL;
-            }
-        }
-        return $str;
+    /**
+     * @param $adapter
+     * @return void
+     */
+    public function setFileManager($adapter)
+    {
+        $this->fileManager = $adapter;
+    }
+
+    /**
+     * @param $adapter
+     * @return void
+     */
+    public function setShellExecutor($adapter)
+    {
+        $this->shellExecutor = $adapter;
+    }
+
+    public function __construct() {
+        $this->fileManager = new NativeFileManager();
+        $this->shellExecutor = new NativeShellExecutor();
     }
 
     public function run() {
@@ -147,149 +173,44 @@ class MicroweberInstaller {
             $this->fileManager->mkdir($this->path);
         }
 
-
-
-        dd($this->path);
-        
-        // Prepare php domain settings for symlinking
-        if ($this->type == 'symlink') {
-
-            $currentPhpIni = '/var/www/vhosts/system/' . $domain->getName() . '/etc/php.ini';
-            $tempPhpIni = $domainDocumentRoot . DIRECTORY_SEPARATOR . 'php.ini';
-
-            $parseOldIniFile = parse_ini_file($currentPhpIni);
-            $parseOldIniFile['open_basedir'] = 'none';
-
-            $generateIniFile = $this->_generateIniFile($parseOldIniFile);
-            $fileManager->filePutContents($tempPhpIni, $generateIniFile);
-
-            $log = pm_ApiCli::callSbin('update_domain_phpini.sh', [$domain->getName(), $tempPhpIni])['stdout'];
-            $fileManager->removeFile($tempPhpIni);
-
-            // Symlink domain enable
-            pm_ApiCli::callSbin('update_domain_server_settings.sh', [$domain->getName(), '-apache-restrict-follow-sym-links','false'])['stdout'];
-        }
-
-        $hostingProperties = $hostingManager->getHostingProperties();
-        if (!$hostingProperties['php']) {
-            throw new \Exception('PHP is not activated on selected domain.');
-        }
-        $phpHandler = $hostingManager->getPhpHandler($hostingProperties['php_handler_id']);
-
-        $this->setProgress(10);
-
-        Modules_Microweber_Log::debug('Start installing Microweber on domain: ' . $domain->getName());
-
-        $dbName =  str_replace('.', '', $domain->getName());
+        $dbName =  str_replace('.', '', 'yourdomain');
         $dbName = substr($dbName, 0, 9);
         $dbName .= '_'.date('His');
         $dbUsername = $dbName;
-        $dbPassword = Modules_Microweber_Helper::getRandomPassword(12, true);
+        $dbPassword = $this->getRandomPassword(12, true);
 
-        if ($this->_databaseDriver == 'mysql') {
-
-            $domainSubscription = $hostingManager->getDomainSubscription($domain->getName());
-            if (!$domainSubscription['webspace']) {
-                throw new \Exception('Webspace is not found. Domain: ' . $domain->getName());
-            }
-
-            $databaseServerDetails = $hostingManager->getDatabaseServerByWebspaceId($domainSubscription['webspaceId']);
-            if (!$databaseServerDetails) {
-                throw new \Exception('Cannot find database servers for webspace. WebspaceId:' . $domainSubscription['webspaceId']);
-            }
-
-            $this->_databaseServerId = $databaseServerDetails['id'];
-
-            Modules_Microweber_Log::debug('Create database for domain: ' . $domain->getName());
-
-            $dbManager = new Modules_Microweber_DatabaseManager();
-            $dbManager->setDomainId($domain->getId());
-            $newDb = $dbManager->createDatabase($dbName, $this->_databaseServerId);
-
-            if (isset($newDb['database']['add-db']['result']['errtext'])) {
-                throw new \Exception($newDb['database']['add-db']['result']['errtext']);
-            }
-
-            $this->setProgress(30);
-
-            if (isset($newDb['database']['add-db']['result']['id'])) {
-                $dbId = $newDb['database']['add-db']['result']['id'];
-            }
-
-            if (!$dbId) {
-                throw new \Exception('Can\'t create database.');
-            }
-
-            if ($dbId) {
-                $newUser = $dbManager->createUser($dbId, $dbUsername, $dbPassword);
-            }
-
-            if (isset($newUser['database']['add-db-user']['result']['errtext'])) {
-                throw new \Exception($newUser['database']['add-db-user']['result']['errtext']);
-            }
-
-            $this->setProgress(40);
-        }
-
-        if ($this->_path) {
-            $domainDocumentRoot = $domainDocumentRoot . '/' . $this->_path;
-            if (!$fileManager->fileExists($domainDocumentRoot)) {
-                $fileManager->mkdir($domainDocumentRoot);
-            }
-        }
-
-        $domainName = $domain->getName();
-        $domainIsActive = $domain->isActive();
-        $domainCreation = $domain->getProperty('cr_date');
-
-        Modules_Microweber_Log::debug('Clear old folder on domain: ' . $domain->getName());
 
         // Clear domain files if exists
-        $this->_prepairDomainFolder($fileManager, $domainDocumentRoot, $domain->getHomePath());
-
-        $this->setProgress(60);
+        $this->_prepairPathFolder();
 
         // First we will make a directories
         foreach ($this->_getDirsToMake() as $dir) {
-            $fileManager->mkdir($domainDocumentRoot . '/' . $dir, '0755', true);
+            $this->fileManager->mkdir($this->path . '/' . $dir, '0755', true);
         }
 
-        $this->setProgress(65);
+        foreach ($this->_getFilesForSymlinking() as $folder) {
 
-        foreach ($this->_getFilesForSymlinking($this->appLatestVersionFolder) as $folder) {
-            $scriptDirOrFile = $this->appLatestVersionFolder . $folder;
-            $domainDirOrFile = $domainDocumentRoot .'/'. $folder;
+            $sourceDirOrFile = $this->sourcePath .'/'. $folder;
+            $targetDirOrFile = $this->path .'/'. $folder;
 
-            if ($this->_type == 'symlink') {
+            if ($this->type == self::TYPE_SYMLINK) {
 
-                // Delete domain file
-                pm_ApiCli::callSbin('filemng', [
-                    $domain->getSysUserLogin(),
-                    'exec',
-                    $domainDocumentRoot,
-                    'rm',
-                    '-rf',
-                    $domainDirOrFile
+                dump($targetDirOrFile);
 
-                ], pm_ApiCli::RESULT_FULL);
+                // Delete file
+                $this->fileManager->delete($targetDirOrFile);
 
                 // Create symlink
-                pm_ApiCli::callSbin('filemng', [
-                    $domain->getSysUserLogin(),
-                    'exec',
-                    $domainDocumentRoot,
-                    'ln',
-                    '-s',
-                    $scriptDirOrFile,
-                    $domainDirOrFile
-
-                ], pm_ApiCli::RESULT_FULL);
+                $this->fileManager->symlink($sourceDirOrFile, $targetDirOrFile);
 
             } else {
-                $fileManager->copyFile($scriptDirOrFile, dirname($domainDirOrFile));
+                $this->fileManager->copy($sourceDirOrFile, dirname($targetDirOrFile));
             }
         }
 
+
+        echo 999;
+        die();
         $this->setProgress(70);
 
 
@@ -487,11 +408,11 @@ class MicroweberInstaller {
         }
     }
 
-    private function _prepairDomainFolder($fileManager, $installPath, $backupPath)
+    private function _prepairPathFolder()
     {
         try {
             $findedFiles = [];
-            foreach ($fileManager->scanDir($installPath) as $file) {
+            foreach ($this->fileManager->scanDir($this->path) as $file) {
                 if ($file == '.' || $file == '..') {
                     continue;
                 }
@@ -499,18 +420,29 @@ class MicroweberInstaller {
             }
 
             if (!empty($findedFiles)) {
+
                 // Make backup dir
-                $backupFilesPath = $backupPath . '/backup_files/backup-' . date('Y-m-d-H-i-s');
-                $fileManager->mkdir($backupFilesPath, null, true);
+                $backupMainFilesPath = $this->path . '/backup_files/';
+                if (!$this->fileManager->isDir($backupMainFilesPath)) {
+                    $this->fileManager->mkdir($backupMainFilesPath);
+                }
+                $backupFilesPath = $backupMainFilesPath . 'backup-' . date('Y-m-d-H-i-s');
+                if (!$this->fileManager->isDir($backupFilesPath)) {
+                    $this->fileManager->mkdir($backupFilesPath);
+                }
 
                 // Move files to backup dir
                 foreach ($findedFiles as $file) {
-                    $fileManager->moveFile($installPath . '/' . $file, $backupFilesPath . '/' . $file);
+                    if ($file == 'backup_files') {
+                        continue;
+                    }
+                    $this->fileManager->moveFile($this->path . '/' . $file, $backupFilesPath . '/' . $file);
                 }
+
             }
 
         } catch (Exception $e) {
-            \pm_Log::warn($e);
+            // error
         }
 
     }
@@ -551,7 +483,7 @@ class MicroweberInstaller {
         return $dirs;
     }
 
-    private function _getFilesForSymlinking($appLatestFolder) {
+    private function _getFilesForSymlinking() {
 
         $files = [];
         $files[] = 'version.txt';
@@ -561,8 +493,8 @@ class MicroweberInstaller {
         $files[] = 'database';
         $files[] = 'userfiles/elements';
 
-        $sfm = new \pm_ServerFileManager();
-        $listTemplates = $sfm->scanDir($appLatestFolder . '/userfiles/templates');
+
+        $listTemplates = $this->fileManager->scanDir($this->path . '/userfiles/templates');
         if (!empty($listTemplates)) {
             foreach ($listTemplates as $template) {
                 if ($template == '.' || $template == '..') {
@@ -572,7 +504,7 @@ class MicroweberInstaller {
             }
         }
 
-        $listModules = $sfm->scanDir($appLatestFolder . '/userfiles/modules');
+        $listModules = $this->fileManager->scanDir($this->path . '/userfiles/modules');
         if (!empty($listModules)) {
             foreach ($listModules as $module) {
                 if ($module == '.' || $module == '..') {
@@ -606,6 +538,48 @@ class MicroweberInstaller {
         $files[] = 'bootstrap/autoload.php';
 
         return $files;
+    }
+
+    private function _generateIniFile($array, $i = 0) {
+        $str = "";
+        foreach ($array as $k => $v) {
+            if (is_array($v)) {
+                $str .= str_repeat(" ",$i*2)."[$k]".PHP_EOL;
+                $str .= $this->_generateIniFile($v, $i+1);
+            } else {
+                $str .= str_repeat(" ", $i * 2) . "$k = $v" . PHP_EOL;
+            }
+        }
+        return $str;
+    }
+
+
+    public static function getRandomPassword($length = 16, $complex = false)
+    {
+        $alphabet = 'ghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+
+        if ($complex) {
+            $alphabet_complex = '!@#$%^&*?_~';
+        }
+
+        $pass = [];
+        $alphaLength = strlen($alphabet) - 1;
+        for ($i = 0; $i < $length; $i ++) {
+            $n = rand(0, $alphaLength);
+            $pass[] = $alphabet[$n];
+        }
+
+        if ($complex) {
+            $alphaLength = strlen($alphabet_complex) - 1;
+            for ($i = 0; $i < $length; $i ++) {
+                $n = rand(0, $alphaLength);
+                $pass[] = $alphabet_complex[$n];
+            }
+
+            shuffle($pass);
+        }
+
+        return implode($pass);
     }
 
 }

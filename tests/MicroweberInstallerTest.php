@@ -1,0 +1,33 @@
+<?php
+
+namespace MicroweberPackages\SharedServerScripts;
+
+use MicroweberPackages\SharedServerScripts\FileManager\Adapters\PleskServerFileManager;
+use MicroweberPackages\SharedServerScripts\Shell\Adapters\PleskShellExecutor;
+use PHPUnit\Framework\TestCase;
+use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
+use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
+
+class MicroweberInstallerTest extends TestCase
+{
+    public function testInstall()
+    {
+        $temp = dirname(__DIR__).'/temp';
+        if (!is_dir($temp)) {
+            mkdir($temp);
+        }
+
+        $targetPath = dirname(__DIR__).'/temp/my-microweber-installation';
+        $sourcePath = dirname(__DIR__).'/temp/microweber-latest';
+
+        $installer = new MicroweberInstaller();
+        $installer->setPath($targetPath);
+        $installer->setSourcePath($sourcePath);
+        $installer->setFileManager(new NativeFileManager());
+        $installer->setShellExecutor(new NativeShellExecutor());
+
+        $status = $installer->run();
+
+    }
+
+}

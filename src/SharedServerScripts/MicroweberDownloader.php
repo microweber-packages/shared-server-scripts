@@ -6,7 +6,6 @@ use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManage
 use MicroweberPackages\SharedServerScripts\Interfaces\IMicroweberDownloader;
 use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 use MicroweberPackages\SharedServerScripts\Shell\ShellExecutor;
-use function Livewire\str;
 
 class MicroweberDownloader implements IMicroweberDownloader {
 

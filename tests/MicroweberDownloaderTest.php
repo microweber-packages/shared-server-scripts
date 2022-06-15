@@ -2,23 +2,26 @@
 
 namespace MicroweberPackages\SharedServerScripts;
 
+use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
 use MicroweberPackages\SharedServerScripts\FileManager\Adapters\PleskServerFileManager;
+use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 use MicroweberPackages\SharedServerScripts\Shell\Adapters\PleskShellExecutor;
 use PHPUnit\Framework\TestCase;
-use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
-use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 
 class MicroweberDownloaderTest extends TestCase
 {
     public function testDownload()
     {
-        mkdir(dirname(__DIR__).'/temp');
+        $temp = dirname(__DIR__).'/temp';
+        if (!is_dir($temp)) {
+            mkdir($temp);
+        }
 
-        $downloadTargetPath = dirname(__DIR__).'/temp/microweber-latest/';
+        $downloadTargetPath = $temp .'/microweber-latest/';
 
         $downloader = new MicroweberDownloader();
-        $downloader->setFileManager(PleskServerFileManager::class);
-        $downloader->setShellExecutor(PleskShellExecutor::class);
+        $downloader->setFileManager(new NativeFileManager());
+        $downloader->setShellExecutor(new NativeShellExecutor());
 
         $status = $downloader->download($downloadTargetPath);
 
