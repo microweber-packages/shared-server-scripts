@@ -35,12 +35,24 @@ class MicroweberAppPathHelper
         return $this->fileManager->isLink($this->path.'/vendor');
     }
 
+    public function isInstalled()
+    {
+        $configFile = $this->path . '/config/microweber.php';
+        if ($this->fileManager->fileExists($configFile)) {
+            return true;
+        }
+
+        return false;
+    }
+
     public function getCreatedAt()
     {
-        $configFile = $this->path . '/config.php';
+        $configFile = $this->path . '/config/app.php';
         if ($this->fileManager->fileExists($configFile)) {
             return date("Y-m-d H:i:s", $this->fileManager->filectime($configFile));
         }
+
+        return false;
     }
 
     public function getCurrentVersion()
@@ -54,18 +66,6 @@ class MicroweberAppPathHelper
         }
 
         return $version;
-    }
-
-    public function getLastDownloadDate()
-    {
-        $versionFile = $this->fileManager->fileExists($this->path . '/version.txt');
-
-        $date = 'unknown';
-        if ($versionFile) {
-            $date = date('Y-m-d- H:i:s', $this->fileManager->filemtime($this->path . '/version.txt'));
-        }
-
-        return $date;
     }
 
     /**
