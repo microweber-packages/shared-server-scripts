@@ -24,5 +24,6 @@ jobs:
       run:
         |
         ls
-        cd /temp/my-microweber-installation/
+        cd /temp
+        ls
         php artisan test
