@@ -446,6 +446,7 @@ class MicroweberInstaller {
         $files = [];
 
         // Index
+        $files[] = 'phpunit.xml';
         $files[] = 'index.php';
         $files[] = '.htaccess';
         $files[] = 'favicon.ico';
