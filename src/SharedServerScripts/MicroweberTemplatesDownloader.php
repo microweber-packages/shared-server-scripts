@@ -3,12 +3,10 @@ namespace MicroweberPackages\SharedServerScripts;
 
 use MicroweberPackages\ComposerClient\Client;
 use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
-use MicroweberPackages\SharedServerScripts\Interfaces\IMicroweberDownloader;
 use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 use MicroweberPackages\SharedServerScripts\Shell\ShellExecutor;
-use function Livewire\str;
 
-class MicroweberDownloader implements IMicroweberDownloader {
+class MicroweberTemplatesDownloader {
 
     /**
      * @var NativeFileManager
@@ -19,11 +17,6 @@ class MicroweberDownloader implements IMicroweberDownloader {
      * @var NativeShellExecutor
      */
     public $shellExecutor;
-
-    /**
-     * @var string
-     */
-    public $realeaseSource = 'dev';
 
     /**
      * @var Client
@@ -91,33 +84,22 @@ class MicroweberDownloader implements IMicroweberDownloader {
             throw new \Exception('Parent folder of target path is not writable.');
         }
 
-        // Get latest release of app
-        $release = $this->getRelease();
-        if (empty($release)) {
-            throw new \Exception('No releases found.');
+        $templates = $this->_getTemplatesFromComposer();
+        if (empty($templates)) {
+            throw new \Exception('No templates found from composer client.');
         }
 
-        // Download the app
-        $status = $this->downloadMainApp($release['url'], $target);
-
-        // Validate app installation
-        $mainAppDownloadingErrors = [];
-        if ($this->fileManager->isDir($target)) {
-            $mainAppDownloadingErrors[] = true;
-        }
-        if ($this->fileManager->isFile($target . DIRECTORY_SEPARATOR . 'index.php')) {
-            $mainAppDownloadingErrors[] = true;
+        $downloaded = [];
+        foreach ($templates as $template) {
+            $downloadToPath = $target . DIRECTORY_SEPARATOR . $template['target-dir'] . DIRECTORY_SEPARATOR;
+            $downloaded[] = $this->downloadTemplate($template['dist']['url'], $downloadToPath);
         }
 
-        if (!empty($mainAppDownloadingErrors)) {
-            throw new \Exception('Error when downloading the main app. Reason: ' . $status);
+        if (!empty($downloaded)) {
+            return $downloaded;
         }
 
-        if (strpos($status, 'Done') !== false) {
-            return ['downloaded'=>true];
-        }
-
-        throw new \Exception('Something went wrong when downloading the main app. Reason: ' . $status);
+        throw new \Exception('Something went wrong when downloading the app templates.');
     }
 
     /**
@@ -125,38 +107,34 @@ class MicroweberDownloader implements IMicroweberDownloader {
      * @param $target
      * @return string
      */
-    public function downloadMainApp($url, $target)
+    public function downloadTemplate($url, $target)
     {
         $status = $this->shellExecutor->executeFile(dirname(dirname(__DIR__))
             . DIRECTORY_SEPARATOR . 'shell-scripts'
-            . DIRECTORY_SEPARATOR . 'unzip_app_version.sh', [base64_encode($url), $target]);
+            . DIRECTORY_SEPARATOR . 'unzip_app_template.sh', [base64_encode($url), $target]);
 
         return $status;
     }
 
     /**
-     * @return string[]
+     * @return array
      */
-    public function getRelease()
+    public function _getTemplatesFromComposer()
     {
-        if ($this->realeaseSource == 'dev') {
-
-            $branch = 'dev';
-
-            return [
-                'version'=>'Latest development version',
-                'composer_url'=>'http://updater.microweberapi.com/builds/'.$branch.'/composer.json',
-                'version_url'=>'http://updater.microweberapi.com/builds/'.$branch.'/version.txt',
-                'url'=>'http://updater.microweberapi.com/builds/'.$branch.'/microweber.zip'
-            ];
+        $templates = [];
+        foreach ($this->composerClient->search() as $packageName=>$packageVersions) {
+            foreach ($packageVersions as $packageVersion) {
+                if ($packageVersion['type'] !== 'microweber-template') {
+                    continue;
+                }
+                if ($packageVersion['dist']['type'] == 'license_key') {
+                    continue;
+                }
+                $templates[$packageName] = $packageVersion;
+            }
         }
 
-        return [
-            'version'=>'Latest production version',
-            'composer_url'=>'http://updater.microweberapi.com/builds/master/composer.json',
-            'version_url'=>'http://updater.microweberapi.com/builds/master/version.txt',
-            'url'=>'http://updater.microweberapi.com/builds/master/microweber.zip'
-        ];
+        return $templates;
     }
 
 }
