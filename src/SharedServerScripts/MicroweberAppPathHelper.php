@@ -30,6 +30,11 @@ class MicroweberAppPathHelper
         $this->path = $path;
     }
 
+    public function isSymlinked()
+    {
+        return $this->fileManager->isLink($this->path.'/vendor');
+    }
+
     public function getCurrentVersion()
     {
         $versionFile = $this->fileManager->fileExists($this->path . '/version.txt');

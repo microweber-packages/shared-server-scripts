@@ -60,4 +60,9 @@ class NativeFileManager implements IFileManager
         return file_get_contents($file);
     }
 
+    public function isLink($file)
+    {
+        return is_link($file);
+    }
+
 }
