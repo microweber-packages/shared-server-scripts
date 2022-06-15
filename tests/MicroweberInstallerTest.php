@@ -25,6 +25,9 @@ class MicroweberInstallerTest extends TestCase
         $installer->setSourcePath($sourcePath);
         $installer->setFileManager(new NativeFileManager());
         $installer->setShellExecutor(new NativeShellExecutor());
+        $installer->setAdminUsername('bobi_unittest');
+        $installer->setAdminPassword('unitest-pass');
+        $installer->setAdminEmail('bobi@unitest.com');
 
         $status = $installer->run();
 

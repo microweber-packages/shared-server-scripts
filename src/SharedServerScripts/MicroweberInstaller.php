@@ -297,68 +297,27 @@ class MicroweberInstaller {
 
             $artisanCommand = array_merge([
                 'php',
-                $this->path,
-                'artisan',
+                $this->path . '/artisan',
                 'microweber:install',
             ], $installArguments);
 
-            $this->shellExecutor->executeCommand($artisanCommand);
+            $executeArtisan = $this->shellExecutor->executeCommand($artisanCommand);
 
-            return ['success'=>true, 'log'=> $artisan['stdout']];
+            $success = false;
+            if (strpos($executeArtisan, 'done') !== false) {
+                $success = true;
+            }
+
+            return ['success'=>$success, 'log'=> $executeArtisan];
         } catch (Exception $e) {
             return ['success'=>false, 'error'=>true, 'log'=> $e->getMessage()];
         }
 
     }
 
-    private function checkSsl($domainName)
-    {
-        $g = @stream_context_create (array("ssl" => array("capture_peer_cert" => true)));
-        $r = @stream_socket_client("ssl://www.".$domainName.":443", $errno, $errstr, 30,
-            STREAM_CLIENT_CONNECT, $g);
-        $cont = @stream_context_get_params($r);
-        if (isset($cont["options"]["ssl"]["peer_certificate"])) {
-            return true;
-        }
-
-        return false;
-    }
-
-    private function addDomainEncryption($domain)
-    {
-        $artisan = false;
-
-        $sslEmail = 'admin@microweber.com';
-
-        $encryptOptions = [];
-        $encryptOptions[] = '--domain';
-        $encryptOptions[] = $domain->getName();
-        $encryptOptions[] = '--email';
-        $encryptOptions[] = $sslEmail;
-
-        // Add SSL
-        try {
-            Modules_Microweber_Log::debug('Start installign SSL for domain: ' . $domain->getName() . '; SSL Email: ' . $sslEmail);
-
-            $artisan = \pm_ApiCli::call('extension', array_merge(['--exec', 'letsencrypt', 'cli.php'], $encryptOptions), \pm_ApiCli::RESULT_FULL);
-
-            Modules_Microweber_Log::debug('Encrypt domain log for: ' . $domain->getName() . '<br />' . $artisan['stdout']. '<br /><br />');
-            Modules_Microweber_Log::debug('Success instalation SSL for domain: ' . $domain->getName());
-
-        } catch(\Exception $e) {
-
-            Modules_Microweber_Log::debug('Can\'t install SSL for domain: ' . $domain->getName());
-            Modules_Microweber_Log::debug('Error: ' . $e->getMessage());
-
-        }
-
-        return $artisan;
-    }
-
     private function _fixHtaccess()
     {
         try {
-
             $content = $this->fileManager->fileGetContents($this->path . '/.htaccess');
             $content = str_replace('-MultiViews -Indexes', 'FollowSymLinks', $content);
 
@@ -500,20 +459,6 @@ class MicroweberInstaller {
 
         return $files;
     }
-
-    private function _generateIniFile($array, $i = 0) {
-        $str = "";
-        foreach ($array as $k => $v) {
-            if (is_array($v)) {
-                $str .= str_repeat(" ",$i*2)."[$k]".PHP_EOL;
-                $str .= $this->_generateIniFile($v, $i+1);
-            } else {
-                $str .= str_repeat(" ", $i * 2) . "$k = $v" . PHP_EOL;
-            }
-        }
-        return $str;
-    }
-
 
     public static function getRandomPassword($length = 16, $complex = false)
     {
