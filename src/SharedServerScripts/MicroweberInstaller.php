@@ -188,49 +188,46 @@ class MicroweberInstaller {
             $this->fileManager->mkdir($this->path . '/' . $dir, '0755', true);
         }
 
-        foreach ($this->_getFilesForSymlinking() as $folder) {
+        $this->type = self::TYPE_SYMLINK;
 
-            $sourceDirOrFile = $this->sourcePath .'/'. $folder;
-            $targetDirOrFile = $this->path .'/'. $folder;
+        if ($this->type == self::TYPE_SYMLINK) {
+            foreach ($this->_getFilesForSymlinking() as $folder) {
 
-            if ($this->type == self::TYPE_SYMLINK) {
-
-                dump($targetDirOrFile);
+                $sourceDirOrFile = $this->sourcePath . '/' . $folder;
+                $targetDirOrFile = $this->path . '/' . $folder;
 
                 // Delete file
-                $this->fileManager->delete($targetDirOrFile);
+                if ($this->fileManager->isFile($targetDirOrFile)) {
+                    $this->fileManager->unlink($targetDirOrFile);
+                }
 
                 // Create symlink
                 $this->fileManager->symlink($sourceDirOrFile, $targetDirOrFile);
 
-            } else {
-                $this->fileManager->copy($sourceDirOrFile, dirname($targetDirOrFile));
             }
         }
 
-
-        echo 999;
-        die();
-        $this->setProgress(70);
-
-
         // And then we will copy folders
         foreach ($this->_getDirsToCopy() as $folder) {
-            $scriptDirOrFile = $this->appLatestVersionFolder . $folder;
-            $domainDirOrFile = $domainDocumentRoot .'/'. $folder;
-            $fileManager->copyFile($scriptDirOrFile, dirname($domainDirOrFile));
+            $sourceDir = $this->sourcePath .'/'. $folder;
+            $targetDir = $this->path .'/'. $folder;
+            $this->fileManager->copyFolder($sourceDir, $targetDir);
         }
 
         // And then we will copy files
         foreach ($this->_getFilesForCopy() as $file) {
-            $fileManager->copyFile($this->appLatestVersionFolder . $file, dirname($domainDocumentRoot . '/' . $file));
+            $sourceFile = $this->sourcePath .'/'. $file;
+            $targetFile = $this->path .'/'. $file;
+            $this->fileManager->copy($sourceFile, $targetFile);
         }
 
-        $this->setProgress(75);
-
-        if ($this->_type == 'symlink') {
-            $this->_fixHtaccess($fileManager, $domainDocumentRoot);
+        if ($this->type == self::TYPE_SYMLINK) {
+            $this->_fixHtaccess();
         }
+
+
+        echo 1; 
+        die();
 
         $this->setProgress(85);
 
@@ -315,32 +312,7 @@ class MicroweberInstaller {
             $args = array_merge($args, $installArguments);
             $artisan = pm_ApiCli::callSbin('filemng', $args, pm_ApiCli::RESULT_FULL);
 
-            $this->setProgress(95);
 
-            Modules_Microweber_Log::debug('Microweber install log for: ' . $domain->getName() . '<br />' . $artisan['stdout']. '<br /><br />');
-
-            //if (!$domain->hasSsl()) {
-            if (!$this->checkSsl($domain->getName())) {
-                $this->addDomainEncryption($domain);
-            } else {
-                Modules_Microweber_Log::debug('Domain allready have a SSL.');
-            }
-
-            // Save domain settings
-            $saveDomainSettings = [
-                'admin_email'=>$adminEmail,
-                'admin_password'=>$adminPassword,
-                'admin_username'=>$adminUsername,
-                'admin_url'=>'admin',
-                'language'=>$this->_language,
-                'created_at'=> date('Y-m-d H:i:s')
-            ];
-            $domain->setSetting('mw_settings_' . md5($domainDocumentRoot), serialize($saveDomainSettings));
-
-            pm_Settings::set('mw_installations_count',  (Modules_Microweber_LicenseData::getAppInstallationsCount() + 1));
-
-            // Set branding json
-            Modules_Microweber_WhiteLabelBranding::applyToInstallation($domain, $domainDocumentRoot);
 
             return ['success'=>true, 'log'=> $artisan['stdout']];
         } catch (Exception $e) {
@@ -393,18 +365,17 @@ class MicroweberInstaller {
         return $artisan;
     }
 
-    private function _fixHtaccess($fileManager, $installPath)
+    private function _fixHtaccess()
     {
         try {
 
-            $content = $fileManager->fileGetContents($installPath . '/.htaccess');
-
+            $content = $this->fileManager->fileGetContents($this->path . '/.htaccess');
             $content = str_replace('-MultiViews -Indexes', 'FollowSymLinks', $content);
 
-            $fileManager->filePutContents($installPath . '/.htaccess', $content);
+            $this->fileManager->filePutContents($this->path . '/.htaccess', $content);
 
         } catch (Exception $e) {
-            \pm_Log::warn($e);
+            // Error
         }
     }
 
@@ -494,7 +465,7 @@ class MicroweberInstaller {
         $files[] = 'userfiles/elements';
 
 
-        $listTemplates = $this->fileManager->scanDir($this->path . '/userfiles/templates');
+        $listTemplates = $this->fileManager->scanDir($this->sourcePath . '/userfiles/templates');
         if (!empty($listTemplates)) {
             foreach ($listTemplates as $template) {
                 if ($template == '.' || $template == '..') {
@@ -504,7 +475,7 @@ class MicroweberInstaller {
             }
         }
 
-        $listModules = $this->fileManager->scanDir($this->path . '/userfiles/modules');
+        $listModules = $this->fileManager->scanDir($this->sourcePath . '/userfiles/modules');
         if (!empty($listModules)) {
             foreach ($listModules as $module) {
                 if ($module == '.' || $module == '..') {

@@ -1,6 +1,8 @@
 <?php
 namespace MicroweberPackages\SharedServerScripts\FileManager\Adapters;
 
+use Symfony\Component\Filesystem\Filesystem;
+
 class NativeFileManager implements IFileManager
 {
 
@@ -96,6 +98,15 @@ class NativeFileManager implements IFileManager
 
     /**
      * @param $file
+     * @return false|string
+     */
+    public function filePutContents($file, $content)
+    {
+        return file_put_contents($file, $content);
+    }
+
+    /**
+     * @param $file
      * @return bool
      */
     public function isLink($file)
@@ -123,4 +134,34 @@ class NativeFileManager implements IFileManager
         return copy($from, $to);
     }
 
+    /**
+     * @param $from
+     * @param $to
+     * @return bool
+     */
+    public function copyFolder($from, $to)
+    {
+        $fileSystem = new Filesystem();
+       return $fileSystem->mirror($from, $to);
+    }
+
+
+    /**
+     * @param $target
+     * @param $link
+     * @return bool
+     */
+    public function symlink($target, $link)
+    {
+        return symlink($target, $link);
+    }
+
+    /**
+     * @param $file
+     * @return bool
+     */
+    public function unlink($file)
+    {
+        return unlink($file);
+    }
 }
