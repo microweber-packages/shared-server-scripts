@@ -226,26 +226,22 @@ class MicroweberInstaller {
         }
 
 
-        echo 1; 
-        die();
-
-        $this->setProgress(85);
 
         $adminEmail = 'admin@microweber.com';
         $adminPassword = '1';
         $adminUsername = '1';
 
-        if (!empty($this->_email)) {
-            $adminEmail = $this->_email;
+        if (!empty($this->adminEmail)) {
+            $adminEmail = $this->adminEmail;
         }
-        if (!empty($this->_password)) {
-            $adminPassword = $this->_password;
+        if (!empty($this->adminPassword)) {
+            $adminPassword = $this->adminPassword;
         }
-        if (!empty($this->_username)) {
-            $adminUsername = $this->_username;
+        if (!empty($this->adminUsername)) {
+            $adminUsername = $this->adminUsername;
         }
 
-        if ($this->_databaseDriver == 'mysql') {
+        if ($this->databaseDriver == self::DATABASE_DRIVER_MYSQL) {
 
             $dbHost = 'localhost:3306';
             if (isset($databaseServerDetails['host']) && isset($databaseServerDetails['port'])) {
@@ -254,10 +250,9 @@ class MicroweberInstaller {
 
         } else {
             $dbHost = 'localhost';
-            $dbName = $domainDocumentRoot . '/storage/database1.sqlite';
+            $dbName = $this->path . '/storage/database.sqlite';
         }
 
-        $this->setProgress(90);
 
         $installArguments = [];
 
@@ -271,12 +266,10 @@ class MicroweberInstaller {
         $installArguments[] = $dbName;
         $installArguments[] = $dbUsername;
         $installArguments[] = $dbPassword;
-        $installArguments[] = $this->_databaseDriver;
+        $installArguments[] = $this->databaseDriver;
 
-        if ($this->_language) {
-            $installationLanguage = $this->_language;
-        } else {
-            $installationLanguage = pm_Settings::get('installation_language');
+        if ($this->language) {
+            $installationLanguage = $this->language;
         }
 
         if (!empty($installationLanguage)) {
@@ -287,32 +280,29 @@ class MicroweberInstaller {
         $installArguments[] = '-p';
         $installArguments[] = 'site_';
 
-        if ($this->_template) {
+        if ($this->template) {
             $installArguments[] = '-t';
-            $installArguments[] = $this->_template;
+            $installArguments[] = $this->template;
         }
 
         $installArguments[] = '-d';
         $installArguments[] = '1';
 
-        if (!$this->_template) {
+        if (!$this->template) {
             $installArguments[] = '-c';
             $installArguments[] = '1';
         }
 
         try {
-            $args = [
-                $domain->getSysUserLogin(),
-                'exec',
-                $domainDocumentRoot,
-                $phpHandler['clipath'],
+
+            $artisanCommand = array_merge([
+                'php',
+                $this->path,
                 'artisan',
                 'microweber:install',
-            ];
-            $args = array_merge($args, $installArguments);
-            $artisan = pm_ApiCli::callSbin('filemng', $args, pm_ApiCli::RESULT_FULL);
+            ], $installArguments);
 
-
+            $this->shellExecutor->executeCommand($artisanCommand);
 
             return ['success'=>true, 'log'=> $artisan['stdout']];
         } catch (Exception $e) {
