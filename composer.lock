@@ -4,8 +4,58 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "0a09a9eee514b6bc11f49daf0bea1ab1",
+    "content-hash": "6b4f5c624fe99b8eb90932d7eebca626",
     "packages": [
+        {
+            "name": "microweber-packages/composer-client",
+            "version": "1.9",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/microweber-packages/composer-client.git",
+                "reference": "f7a3d4343c501e33ffc8e47e65d8155e218e7bbf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/microweber-packages/composer-client/zipball/f7a3d4343c501e33ffc8e47e65d8155e218e7bbf",
+                "reference": "f7a3d4343c501e33ffc8e47e65d8155e218e7bbf",
+                "shasum": ""
+            },
+            "require": {
+                "ext-json": "*",
+                "php": ">=7.2"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "^8.0 || ^9.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "MicroweberPackages\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Microweber",
+                    "email": "info@microweber.com"
+                },
+                {
+                    "name": "Bozhidar Slaveykov",
+                    "email": "bobi@microweber.com"
+                }
+            ],
+            "description": "Composer Client",
+            "homepage": "http://microweber.com",
+            "support": {
+                "email": "support@microweber.com",
+                "issues": "https://github.com/microweber-packages/composer-client/issues",
+                "source": "https://github.com/microweber-packages/composer-client/tree/1.9"
+            },
+            "time": "2022-06-08T15:26:57+00:00"
+        },
         {
             "name": "symfony/polyfill-php80",
             "version": "v1.26.0",
