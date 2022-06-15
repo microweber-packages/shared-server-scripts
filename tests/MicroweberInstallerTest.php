@@ -31,6 +31,11 @@ class MicroweberInstallerTest extends TestCase
 
         $status = $installer->run();
 
+        $this->assertTrue($status['success']);
+        $this->assertTrue(is_file($targetPath.'/config/app.php'));
+        $this->assertTrue(is_file($targetPath.'/config/microweber.php'));
+
+
     }
 
 }
