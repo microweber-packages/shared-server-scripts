@@ -88,12 +88,13 @@ class MicroweberInstaller {
         $this->sourcePath = $path;
     }
 
-    /**
-     * @param $type
-     * @return void
-     */
-    public function setType($type) {
-        $this->type = $type;
+
+    public function setSymlinkInstallation() {
+        $this->type = self::TYPE_SYMLINK;
+    }
+
+    public function setStandaloneInstallation() {
+        $this->type = self::TYPE_STANDALONE;
     }
 
     /**
@@ -188,24 +189,25 @@ class MicroweberInstaller {
             $this->fileManager->mkdir($this->path . '/' . $dir, '0755', true);
         }
 
-        $this->type = self::TYPE_SYMLINK;
+        foreach ($this->_getFilesForSymlinking() as $folder) {
 
-        if ($this->type == self::TYPE_SYMLINK) {
-            foreach ($this->_getFilesForSymlinking() as $folder) {
+            $sourceDirOrFile = $this->sourcePath . '/' . $folder;
+            $targetDirOrFile = $this->path . '/' . $folder;
 
-                $sourceDirOrFile = $this->sourcePath . '/' . $folder;
-                $targetDirOrFile = $this->path . '/' . $folder;
-
-                // Delete file
-                if ($this->fileManager->isFile($targetDirOrFile)) {
-                    $this->fileManager->unlink($targetDirOrFile);
-                }
-
+            if ($this->type == self::TYPE_SYMLINK) {
                 // Create symlink
                 $this->fileManager->symlink($sourceDirOrFile, $targetDirOrFile);
-
+            } else {
+                if ($this->fileManager->isDir($sourceDirOrFile)) {
+                  //  dump([$sourceDirOrFile, $targetDirOrFile]);
+                    $this->fileManager->copyFolder($sourceDirOrFile, $targetDirOrFile);
+                } else {
+                   // dump(['file', $sourceDirOrFile, $targetDirOrFile]);
+                    $this->fileManager->copy($sourceDirOrFile, $targetDirOrFile);
+                }
             }
         }
+
 
         // And then we will copy folders
         foreach ($this->_getDirsToCopy() as $folder) {
