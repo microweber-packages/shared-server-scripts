@@ -55,6 +55,11 @@ class NativeFileManager implements IFileManager
         return filemtime($file);
     }
 
+    public function filectime($file)
+    {
+        return filectime($file);
+    }
+
     public function fileGetContents($file)
     {
         return file_get_contents($file);

@@ -30,9 +30,17 @@ class MicroweberAppPathHelper
         $this->path = $path;
     }
 
-    public function isSymlinked()
+    public function isSymlink()
     {
         return $this->fileManager->isLink($this->path.'/vendor');
+    }
+
+    public function getCreatedAt()
+    {
+        $configFile = $this->path . '/config.php';
+        if ($this->fileManager->fileExists($configFile)) {
+            return date("Y-m-d H:i:s", $this->fileManager->filectime($configFile));
+        }
     }
 
     public function getCurrentVersion()
