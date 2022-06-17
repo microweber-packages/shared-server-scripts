@@ -48,6 +48,15 @@ class MicroweberInstaller {
      */
     protected $sourcePath = false;
 
+    /**
+     * @var bool
+     */
+    protected $chownUser = false;
+
+    /**
+     * @var bool
+     */
+    protected $chownAfterInstall = false;
 
     /**
      * @var bool
@@ -163,6 +172,32 @@ class MicroweberInstaller {
         $this->shellExecutor = $adapter;
     }
 
+    /**
+     * @param $user
+     * @return void
+     */
+    public function setChownUser($user)
+    {
+        $this->chownUser = $user;
+    }
+
+    public function getChownUser()
+    {
+        if ($this->chownUser) {
+            return $this->chownUser;
+        }
+
+        return $this->_getFileOwnership($this->path);
+    }
+
+    /**
+     * @return void
+     */
+    public function enableChownAfterInstall()
+    {
+        $this->chownAfterInstall = true;
+    }
+
     public function __construct() {
         $this->fileManager = new NativeFileManager();
         $this->shellExecutor = new NativeShellExecutor();
@@ -179,7 +214,6 @@ class MicroweberInstaller {
         $dbName .= '_'.date('His');
         $dbUsername = $dbName;
         $dbPassword = $this->getRandomPassword(12, true);
-
 
         // Clear domain files if exists
         $this->_prepairPathFolder();
@@ -227,7 +261,7 @@ class MicroweberInstaller {
             $this->_fixHtaccess();
         }
 
-
+        $this->_chownAfterInstall();
 
         $adminEmail = 'admin@microweber.com';
         $adminPassword = '1';
@@ -315,6 +349,25 @@ class MicroweberInstaller {
             return ['success'=>false, 'error'=>true, 'log'=> $e->getMessage()];
         }
 
+    }
+
+    private function _chownAfterInstall()
+    {
+        if ($this->chownAfterInstall) {
+
+            $chownUser = $this->getChownUser();
+
+            exec("chown -R {$chownUser}:{$chownUser} {$this->path}.htaccess");
+            exec("chown -R {$chownUser}:{$chownUser} {$this->path}*");
+            exec("chown -R {$chownUser}:{$chownUser} {$this->path}.[^.]*");
+            exec("chmod 755 -R {$this->path}");
+            exec('find ' . $this->path . 'storage -type d -exec chmod 750 {} \;');
+            exec('find ' . $this->path . 'storage -type f -exec chmod 640 {} \;');
+            exec('find ' . $this->path . '.env -type f -exec chmod 640 {} \;');
+            exec('find ' . $this->path . 'config -type d -exec chmod 750 {} \;');
+            exec('find ' . $this->path . 'config -type f -exec chmod 640 {} \;');
+
+        }
     }
 
     private function _fixHtaccess()
@@ -491,4 +544,14 @@ class MicroweberInstaller {
         return implode($pass);
     }
 
+    private function _getFileOwnership($file)
+    {
+        $stat = stat($file);
+        if ($stat) {
+            $group = posix_getgrgid($stat[5]);
+            $user = posix_getpwuid($stat[4]);
+            return compact('user', 'group');
+        }
+
+    }
 }
