@@ -357,15 +357,15 @@ class MicroweberInstaller {
 
             $chownUser = $this->getChownUser();
 
-            exec("chown -R {$chownUser}:{$chownUser} {$this->path}.htaccess");
-            exec("chown -R {$chownUser}:{$chownUser} {$this->path}*");
-            exec("chown -R {$chownUser}:{$chownUser} {$this->path}.[^.]*");
-            exec("chmod 755 -R {$this->path}");
-            exec('find ' . $this->path . 'storage -type d -exec chmod 750 {} \;');
-            exec('find ' . $this->path . 'storage -type f -exec chmod 640 {} \;');
-            exec('find ' . $this->path . '.env -type f -exec chmod 640 {} \;');
-            exec('find ' . $this->path . 'config -type d -exec chmod 750 {} \;');
-            exec('find ' . $this->path . 'config -type f -exec chmod 640 {} \;');
+            $this->shellExecutor->executeCommand("chown -R {$chownUser}:{$chownUser} {$this->path}.htaccess");
+            $this->shellExecutor->executeCommand("chown -R {$chownUser}:{$chownUser} {$this->path}*");
+            $this->shellExecutor->executeCommand("chown -R {$chownUser}:{$chownUser} {$this->path}.[^.]*");
+            $this->shellExecutor->executeCommand("chmod 755 -R {$this->path}");
+            $this->shellExecutor->executeCommand('find ' . $this->path . 'storage -type d -$this->shellExecutor->executeCommand chmod 750 {} \;');
+            $this->shellExecutor->executeCommand('find ' . $this->path . 'storage -type f -$this->shellExecutor->executeCommand chmod 640 {} \;');
+            $this->shellExecutor->executeCommand('find ' . $this->path . '.env -type f -$this->shellExecutor->executeCommand chmod 640 {} \;');
+            $this->shellExecutor->executeCommand('find ' . $this->path . 'config -type d -$this->shellExecutor->executeCommand chmod 750 {} \;');
+            $this->shellExecutor->executeCommand('find ' . $this->path . 'config -type f -exec chmod 640 {} \;');
 
         }
     }
