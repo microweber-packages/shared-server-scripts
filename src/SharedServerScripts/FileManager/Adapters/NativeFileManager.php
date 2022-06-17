@@ -1,8 +1,6 @@
 <?php
 namespace MicroweberPackages\SharedServerScripts\FileManager\Adapters;
 
-use Symfony\Component\Filesystem\Filesystem;
-
 class NativeFileManager implements IFileManager
 {
 
@@ -141,8 +139,18 @@ class NativeFileManager implements IFileManager
      */
     public function copyFolder($from, $to)
     {
-        $fileSystem = new Filesystem();
-       return $fileSystem->mirror($from, $to);
+        mkdir($to, 0755);
+        foreach (
+            $iterator = new \RecursiveIteratorIterator(
+                new \RecursiveDirectoryIterator($from, \RecursiveDirectoryIterator::SKIP_DOTS),
+                \RecursiveIteratorIterator::SELF_FIRST) as $item
+        ) {
+            if ($item->isDir()) {
+                mkdir($to . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
+            } else {
+                copy($item, $to . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
+            }
+        }
     }
 
 
