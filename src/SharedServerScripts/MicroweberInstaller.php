@@ -355,16 +355,10 @@ class MicroweberInstaller {
 
             $chownUser = $this->getChownUser();
 
-            exec("chown -R {$chownUser}:{$chownUser} {$this->path}.htaccess");
-            exec("chown -R {$chownUser}:{$chownUser} {$this->path}*");
-            exec("chown -R {$chownUser}:{$chownUser} {$this->path}.[^.]*");
-            exec("chmod 755 -R {$this->path}");
-            exec('find ' . $this->path . 'storage -type d -exec chmod 750 {} \;');
-            exec('find ' . $this->path . 'storage -type f -exec chmod 640 {} \;');
-            exec('find ' . $this->path . '.env -type f -exec chmod 640 {} \;');
-            exec('find ' . $this->path . 'config -type d -exec chmod 750 {} \;');
-            exec('find ' . $this->path . 'config -type f -exec chmod 640 {} \;');
-
+            $status = $this->shellExecutor->executeFile(dirname(dirname(__DIR__))
+                . DIRECTORY_SEPARATOR . 'shell-scripts'
+                . DIRECTORY_SEPARATOR . 'chown_installed_app.sh', [$chownUser, $this->path]);
+            
         }
     }
 
