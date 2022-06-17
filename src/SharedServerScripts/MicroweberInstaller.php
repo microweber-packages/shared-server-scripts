@@ -26,6 +26,26 @@ class MicroweberInstaller {
     /**
      * @var string
      */
+    protected $databaseHost = 'localhost:3306';
+
+    /**
+     * @var
+     */
+    protected $databaseUsername;
+
+    /**
+     * @var
+     */
+    protected $databasePassword;
+
+    /**
+     * @var
+     */
+    protected $databaseName;
+
+    /**
+     * @var string
+     */
     protected $adminEmail = 'admin@microweber.com';
 
     /**
@@ -131,6 +151,30 @@ class MicroweberInstaller {
     }
 
     /**
+     * @param $username
+     * @return void
+     */
+    public function setDatabaseUsername($username) {
+        $this->databaseUsername = $username;
+    }
+
+    /**
+     * @param $password
+     * @return void
+     */
+    public function setDatabasePassword($password) {
+        $this->databasePassword = $password;
+    }
+
+    /**
+     * @param $name
+     * @return void
+     */
+    public function setDatabaseName($name) {
+        $this->databaseName = $name;
+    }
+
+    /**
      * @param $email
      * @return void
      */
@@ -209,12 +253,6 @@ class MicroweberInstaller {
             $this->fileManager->mkdir($this->path);
         }
 
-        $dbName =  str_replace('.', '', 'yourdomain');
-        $dbName = substr($dbName, 0, 9);
-        $dbName .= '_'.date('His');
-        $dbUsername = $dbName;
-        $dbPassword = $this->getRandomPassword(12, true);
-
         // Clear domain files if exists
         $this->_prepairPathFolder();
 
@@ -259,45 +297,23 @@ class MicroweberInstaller {
             $this->_fixHtaccess();
         }
 
-        $adminEmail = 'admin@microweber.com';
-        $adminPassword = '1';
-        $adminUsername = '1';
-
-        if (!empty($this->adminEmail)) {
-            $adminEmail = $this->adminEmail;
+        if ($this->databaseDriver == self::DATABASE_DRIVER_SQLITE) {
+            $this->databaseHost = 'localhost';
+            $this->databaseName = $this->path . '/storage/database.sqlite';
         }
-        if (!empty($this->adminPassword)) {
-            $adminPassword = $this->adminPassword;
-        }
-        if (!empty($this->adminUsername)) {
-            $adminUsername = $this->adminUsername;
-        }
-
-        if ($this->databaseDriver == self::DATABASE_DRIVER_MYSQL) {
-
-            $dbHost = 'localhost:3306';
-            if (isset($databaseServerDetails['host']) && isset($databaseServerDetails['port'])) {
-                $dbHost = $databaseServerDetails['host'] . ':' . $databaseServerDetails['port'];
-            }
-
-        } else {
-            $dbHost = 'localhost';
-            $dbName = $this->path . '/storage/database.sqlite';
-        }
-
 
         $installArguments = [];
 
         // Admin details
-        $installArguments[] =  $adminEmail;
-        $installArguments[] =  $adminUsername;
-        $installArguments[] =  $adminPassword;
+        $installArguments[] =  $this->adminEmail;
+        $installArguments[] =  $this->adminUsername;
+        $installArguments[] =  $this->adminPassword;
 
         // Database settings
-        $installArguments[] = $dbHost;
-        $installArguments[] = $dbName;
-        $installArguments[] = $dbUsername;
-        $installArguments[] = $dbPassword;
+        $installArguments[] = $this->databaseHost;
+        $installArguments[] = $this->databaseName;
+        $installArguments[] = $this->databaseUsername;
+        $installArguments[] = $this->databasePassword;
         $installArguments[] = $this->databaseDriver;
 
         if ($this->language) {
