@@ -259,8 +259,6 @@ class MicroweberInstaller {
             $this->_fixHtaccess();
         }
 
-        $this->_chownAfterInstall();
-
         $adminEmail = 'admin@microweber.com';
         $adminPassword = '1';
         $adminUsername = '1';
@@ -337,6 +335,8 @@ class MicroweberInstaller {
 
             $executeArtisan = $this->shellExecutor->executeCommand($artisanCommand);
 
+            $this->_chownAfterInstall();
+
             $success = false;
             if (strpos($executeArtisan, 'done') !== false) {
                 $success = true;
@@ -358,7 +358,7 @@ class MicroweberInstaller {
             $status = $this->shellExecutor->executeFile(dirname(dirname(__DIR__))
                 . DIRECTORY_SEPARATOR . 'shell-scripts'
                 . DIRECTORY_SEPARATOR . 'chown_installed_app.sh', [$chownUser, $this->path]);
-            
+
         }
     }
 
