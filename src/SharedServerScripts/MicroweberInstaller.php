@@ -343,6 +343,8 @@ class MicroweberInstaller {
 
         try {
 
+            $this->_chownFolders();
+            
             $artisanCommand = array_merge([
                 'php',
                 $this->path . '/artisan',
@@ -351,7 +353,7 @@ class MicroweberInstaller {
 
             $executeArtisan = $this->shellExecutor->executeCommand($artisanCommand);
 
-            $this->_chownAfterInstall();
+            $this->_chownFolders();
 
             $success = false;
             if (strpos($executeArtisan, 'done') !== false) {
@@ -365,7 +367,7 @@ class MicroweberInstaller {
 
     }
 
-    private function _chownAfterInstall()
+    private function _chownFolders()
     {
         if ($this->chownAfterInstall) {
 
