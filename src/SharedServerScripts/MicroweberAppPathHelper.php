@@ -86,6 +86,50 @@ class MicroweberAppPathHelper
     /**
      * @return array
      */
+    public function getSupportedModules()
+    {
+        $modules = [];
+        $modulesPath = $this->path . '/userfiles/modules/';
+
+        if ($this->fileManager->fileExists($modulesPath)) {
+            $listDir = $this->fileManager->scanDir($modulesPath, true);
+            foreach ($listDir as $file) {
+                if ($file === '.' || $file === '..') {
+                    continue;
+                }
+                $upperText = $file;
+                $upperText = ucfirst($upperText);
+
+                // Read config from template path
+                $config = false;
+                $sourceModuleVersion = false;
+                $sourceModuleConfig = false;
+                // Check for config file
+                $moduleFolderPathConfig = $modulesPath . $file.DIRECTORY_SEPARATOR.'config.php';
+                if (is_file($moduleFolderPathConfig)) {
+                    include $moduleFolderPathConfig;
+                    $sourceModuleConfig = $config;
+                }
+                if (isset($sourceModuleConfig['version'])) {
+                    $sourceModuleVersion = $sourceModuleConfig['version'];
+                }
+
+                $modules[] = [
+                    'targetDir' => trim($file),
+                    'version' => $sourceModuleVersion,
+                    'name' => $upperText
+                ];
+            }
+        }
+
+        asort($modules);
+
+        return $modules;
+    }
+
+    /**
+     * @return array
+     */
     public function getSupportedTemplates()
     {
         $templates = [];

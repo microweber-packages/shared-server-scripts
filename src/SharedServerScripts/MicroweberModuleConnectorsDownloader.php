@@ -1,0 +1,93 @@
+<?php
+namespace MicroweberPackages\SharedServerScripts;
+
+use MicroweberPackages\ComposerClient\Client;
+use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
+use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
+use MicroweberPackages\SharedServerScripts\Shell\ShellExecutor;
+
+class MicroweberModuleConnectorsDownloader {
+
+    /**
+     * @var NativeFileManager
+     */
+    public $fileManager;
+
+    /**
+     * @var NativeShellExecutor
+     */
+    public $shellExecutor;
+
+    /**
+     * @var Client
+     */
+    public $composerClient;
+
+    /**
+     * @param $fileManagerAdapter
+     * @param $shellExecutorAdapter
+     */
+    public function __construct() {
+        $this->fileManager = new NativeFileManager();
+        $this->shellExecutor = new NativeShellExecutor();
+        $this->composerClient = new Client();
+    }
+
+    /**
+     * @param $adapter
+     * @return void
+     */
+    public function setFileManager($adapter)
+    {
+        $this->fileManager = $adapter;
+    }
+
+    /**
+     * @param $adapter
+     * @return void
+     */
+    public function setShellExecutor($adapter)
+    {
+        $this->shellExecutor = $adapter;
+    }
+
+    /**
+     * @param $client
+     * @return void
+     */
+    public function setComposerClient($client)
+    {
+        $this->composerClient = $client;
+    }
+
+    /**
+     * @param $source
+     * @return void
+     */
+    public function setReleaseSource($source)
+    {
+        $this->realeaseSource = $source;
+    }
+
+    /**
+     * @param string $target
+     * @return void
+     */
+    public function download(string $target)
+    {
+        // Validate target path
+        if (!$this->fileManager->isDir(dirname($target))) {
+            throw new \Exception('Parent folder of target path is not valid.');
+        }
+
+        if (!$this->fileManager->isWritable(dirname($target))) {
+            throw new \Exception('Parent folder of target path is not writable.');
+        }
+
+
+
+
+        throw new \Exception('Something went wrong when downloading the module connectors.');
+    }
+
+}
