@@ -84,10 +84,59 @@ class MicroweberModuleConnectorsDownloader {
             throw new \Exception('Parent folder of target path is not writable.');
         }
 
+        $this->composerClient->packageServers = [
+            'https://market.microweberapi.com/packages/microweberserverpackages/packages.json'
+        ];
 
+        $modules = $this->_getModulesFromComposer();
+        if (empty($modules)) {
+            throw new \Exception('No templates found from composer client.');
+        }
+
+        $downloaded = [];
+        foreach ($modules as $module) {
+            $downloadToPath = $target . DIRECTORY_SEPARATOR . $module['target-dir'] . DIRECTORY_SEPARATOR;
+            $downloaded[] = $this->downloadModule($module['dist']['url'], $downloadToPath);
+        }
+
+        if (!empty($downloaded)) {
+            return $downloaded;
+        }
 
 
         throw new \Exception('Something went wrong when downloading the module connectors.');
     }
 
+
+    /**
+     * @param $url
+     * @param $target
+     * @return string
+     */
+    public function downloadModule($url, $target)
+    {
+        $status = $this->shellExecutor->executeFile(dirname(dirname(__DIR__))
+            . DIRECTORY_SEPARATOR . 'shell-scripts'
+            . DIRECTORY_SEPARATOR . 'unzip_app_module.sh', [base64_encode($url), $target]);
+
+        return $status;
+    }
+
+    public function _getModulesFromComposer()
+    {
+        $modules = [];
+        foreach ($this->composerClient->search() as $packageName=>$packageVersions) {
+            foreach ($packageVersions as $packageVersion) {
+                if ($packageVersion['type'] !== 'microweber-module') {
+                    continue;
+                }
+                if ($packageVersion['dist']['type'] == 'license_key') {
+                    continue;
+                }
+                $modules[$packageName] = $packageVersion;
+            }
+        }
+
+        return $modules;
+    }
 }
