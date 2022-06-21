@@ -84,10 +84,6 @@ class MicroweberModuleConnectorsDownloader {
             throw new \Exception('Parent folder of target path is not writable.');
         }
 
-        $this->composerClient->packageServers = [
-            'https://market.microweberapi.com/packages/microweberserverpackages/packages.json'
-        ];
-
         $modules = $this->_getModulesFromComposer();
         if (empty($modules)) {
             throw new \Exception('No templates found from composer client.');
