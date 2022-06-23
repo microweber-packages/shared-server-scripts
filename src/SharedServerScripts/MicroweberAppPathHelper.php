@@ -39,6 +39,15 @@ class MicroweberAppPathHelper
     }
 
     /**
+     * @param $adapter
+     * @return void
+     */
+    public function setFileManager($adapter)
+    {
+        $this->fileManager = $adapter;
+    }
+
+    /**
      * @param $path
      * @return void
      */
