@@ -172,4 +172,23 @@ class NativeFileManager implements IFileManager
     {
         return unlink($file);
     }
+
+    /**
+     * @param $dir
+     * @return bool
+     */
+    public function rmdirRecursive($dir)
+    {
+        $files = new \RecursiveIteratorIterator(
+            new \RecursiveDirectoryIterator($dir, \RecursiveDirectoryIterator::SKIP_DOTS),
+            \RecursiveIteratorIterator::CHILD_FIRST
+        );
+
+        foreach ($files as $fileinfo) {
+            $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
+            $todo($fileinfo->getRealPath());
+        }
+
+        rmdir($dir);
+    }
 }
