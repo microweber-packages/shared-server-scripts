@@ -36,7 +36,7 @@ class MicroweberInstallationsRecursiveScanner
     /**
      * @return array
      */
-    public function scan()
+    public function scanRecusrive()
     {
         $installations = [];
 
@@ -51,32 +51,44 @@ class MicroweberInstallationsRecursiveScanner
             if (strpos($file->getPathname(), '/config/microweber.php') !== false) {
                 $skip = false;
             }
+
             if ($skip) {
                 continue;
             }
 
             $scanPath = dirname(dirname($file->getPathname())) . '/';
 
-            $sharedPathHelper = new MicroweberAppPathHelper();
-            $sharedPathHelper->setPath($scanPath);
-            $createdAt = $sharedPathHelper->getCreatedAt();
+            $installation = $this->scanPath($scanPath);
 
-            if (!$createdAt) {
-                continue;
+            if (!empty($installation)) {
+                $installations[] = $installation;
             }
 
-            $installations[] = [
-                'path'=>$scanPath,
-                'is_symlink'=>$sharedPathHelper->isSymlink(),
-                'version'=>$sharedPathHelper->getCurrentVersion(),
-                'installed'=>$sharedPathHelper->isInstalled(),
-                'installed_templates'=>$sharedPathHelper->getSupportedTemplates(),
-                'installed_languages'=>$sharedPathHelper->getSupportedLanguages(),
-                'created_at'=>$createdAt
-            ];
         }
 
         return $installations;
+    }
+
+
+    public function scanPath($path)
+    {
+        $sharedPathHelper = new MicroweberAppPathHelper();
+        $sharedPathHelper->setPath($path);
+        $createdAt = $sharedPathHelper->getCreatedAt();
+
+        if (!$createdAt) {
+            return;
+        }
+
+        return [
+            'path'=>$path,
+            'is_symlink'=>$sharedPathHelper->isSymlink(),
+            'version'=>$sharedPathHelper->getCurrentVersion(),
+            'installed'=>$sharedPathHelper->isInstalled(),
+            'installed_templates'=>$sharedPathHelper->getSupportedTemplates(),
+            'installed_languages'=>$sharedPathHelper->getSupportedLanguages(),
+            'created_at'=>$createdAt
+        ];
     }
 
 }

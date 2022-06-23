@@ -338,6 +338,7 @@ class MicroweberInstaller {
 
             $artisanCommand = array_merge([
                 'php',
+                '-d memory_limit=512M', 
                 $this->path . '/artisan',
                 'microweber:install',
             ], $installArguments);
