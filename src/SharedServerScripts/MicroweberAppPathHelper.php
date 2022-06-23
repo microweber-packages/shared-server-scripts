@@ -3,6 +3,7 @@
 namespace MicroweberPackages\SharedServerScripts;
 
 use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
+use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 
 class MicroweberAppPathHelper
 {
@@ -17,11 +18,24 @@ class MicroweberAppPathHelper
     public $fileManager;
 
     /**
-     * @param $fileManagerAdapter
+     * @var NativeShellExecutor
      */
+    public $shellExecutor;
+
     public function __construct()
     {
         $this->fileManager = new NativeFileManager();
+        $this->shellExecutor = new NativeShellExecutor();
+    }
+
+
+    /**
+     * @param $adapter
+     * @return void
+     */
+    public function setShellExecutor($adapter)
+    {
+        $this->shellExecutor = $adapter;
     }
 
     /**
@@ -132,47 +146,24 @@ class MicroweberAppPathHelper
      */
     public function getSupportedTemplates()
     {
+
         $templates = [];
-        $templatesPath = $this->path . '/userfiles/templates/';
 
-        if ($this->fileManager->fileExists($templatesPath)) {
-            $listDir = $this->fileManager->scanDir($templatesPath, true);
-            foreach ($listDir as $file) {
-                if ($file === '.' || $file === '..') {
-                    continue;
-                }
-                $upperText = $file;
-                $upperText = ucfirst($upperText);
+        $executeArtisan = $this->shellExecutor->executeCommand([
+            'php',
+            '-d memory_limit=512M',
+            $this->path . '/artisan',
+            'microweber:reload_database',
+        ]);
 
-                // Read config from template path
-                $config = false;
-                $sourceTemplateVersion = false;
-                $sourceTemplateConfig = false;
-                // Check for config file
-                $templateFolderPathConfig = $templatesPath . $file.DIRECTORY_SEPARATOR.'config.php';
-                if (is_file($templateFolderPathConfig)) {
-                    include $templateFolderPathConfig;
-                    $sourceTemplateConfig = $config;
-                }
-                if (isset($sourceTemplateConfig['version'])) {
-                    $sourceTemplateVersion = $sourceTemplateConfig['version'];
-                }
+        $executeArtisan = $this->shellExecutor->executeCommand([
+            'php',
+            '-d memory_limit=512M',
+            $this->path . '/artisan',
+            'microweber:get-templates',
+        ]);
 
-                $templates[] = [
-                    'targetDir' => trim($file),
-                    'version' => $sourceTemplateVersion,
-                    'name' => $upperText
-                ];
-            }
-        } else {
-            $templates[] = [
-                'targetDir' => 'default',
-                'version' => '0.0',
-                'name' => 'Default'
-            ];
-        }
-
-        asort($templates);
+        dd($executeArtisan);
 
         return $templates;
     }

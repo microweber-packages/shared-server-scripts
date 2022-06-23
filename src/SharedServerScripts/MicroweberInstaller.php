@@ -305,46 +305,37 @@ class MicroweberInstaller {
         $installArguments = [];
 
         // Admin details
-        $installArguments[] =  $this->adminEmail;
-        $installArguments[] =  $this->adminUsername;
-        $installArguments[] =  $this->adminPassword;
+        $installArguments[] =  '--email='.  $this->adminEmail;
+        $installArguments[] =  '--username='.  $this->adminUsername;
+        $installArguments[] =  '--password='.  $this->adminPassword;
 
         // Database settings
-        $installArguments[] = $this->databaseHost;
-        $installArguments[] = $this->databaseName;
-        $installArguments[] = $this->databaseUsername;
-        $installArguments[] = $this->databasePassword;
-        $installArguments[] = $this->databaseDriver;
+        $installArguments[] = '--db_host='.  $this->databaseHost;
+        $installArguments[] = '--db_name='.  $this->databaseName;
+        $installArguments[] = '--db_user='.  $this->databaseUsername;
+        $installArguments[] = '--db_password="'.  $this->databasePassword.'"';
+        $installArguments[] = '--db_driver='.  $this->databaseDriver;
 
         if ($this->language) {
-            $installationLanguage = $this->language;
+            $installArguments[] = '--language='.  trim($this->language);
         }
 
-        if (!empty($installationLanguage)) {
-            $installArguments[] = '-l';
-            $installArguments[] = trim($installationLanguage);
-        }
-
-        $installArguments[] = '-p';
-        $installArguments[] = 'site_';
+        $installArguments[] = '--db_prefix=site_';
 
         if ($this->template) {
-            $installArguments[] = '-t';
-            $installArguments[] = $this->template;
+            $installArguments[] = '--template='. $this->template;
         }
 
-        $installArguments[] = '-d';
-        $installArguments[] = '1';
+        $installArguments[] = '--default-content=1';
 
         if (!$this->template) {
-            $installArguments[] = '-c';
-            $installArguments[] = '1';
+            $installArguments[] = '--config_only=1';
         }
 
         try {
 
             $this->_chownFolders();
-            
+
             $artisanCommand = array_merge([
                 'php',
                 $this->path . '/artisan',
