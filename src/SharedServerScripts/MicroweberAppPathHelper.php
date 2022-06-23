@@ -102,43 +102,22 @@ class MicroweberAppPathHelper
      */
     public function getSupportedModules()
     {
-        $modules = [];
-        $modulesPath = $this->path . '/userfiles/modules/';
-
-        if ($this->fileManager->fileExists($modulesPath)) {
-            $listDir = $this->fileManager->scanDir($modulesPath, true);
-            foreach ($listDir as $file) {
-                if ($file === '.' || $file === '..') {
-                    continue;
-                }
-                $upperText = $file;
-                $upperText = ucfirst($upperText);
-
-                // Read config from template path
-                $config = false;
-                $sourceModuleVersion = false;
-                $sourceModuleConfig = false;
-                // Check for config file
-                $moduleFolderPathConfig = $modulesPath . $file.DIRECTORY_SEPARATOR.'config.php';
-                if (is_file($moduleFolderPathConfig)) {
-                    include $moduleFolderPathConfig;
-                    $sourceModuleConfig = $config;
-                }
-                if (isset($sourceModuleConfig['version'])) {
-                    $sourceModuleVersion = $sourceModuleConfig['version'];
-                }
-
-                $modules[] = [
-                    'targetDir' => trim($file),
-                    'version' => $sourceModuleVersion,
-                    'name' => $upperText
-                ];
+        try {
+            $executeArtisan = $this->shellExecutor->executeCommand([
+                'php',
+                '-d memory_limit=512M',
+                $this->path . '/artisan',
+                'microweber:get-modules',
+            ]);
+            $decodeArtisanOutput = json_decode($executeArtisan, true);
+            if (!empty($decodeArtisanOutput)) {
+                return $decodeArtisanOutput;
             }
+        } catch (\Exception $e) {
+
         }
 
-        asort($modules);
-
-        return $modules;
+        return [];
     }
 
     /**
@@ -146,26 +125,23 @@ class MicroweberAppPathHelper
      */
     public function getSupportedTemplates()
     {
+        try {
+            $executeArtisan = $this->shellExecutor->executeCommand([
+                'php',
+                '-d memory_limit=512M',
+                $this->path . '/artisan',
+                'microweber:get-templates',
+            ]);
 
-        $templates = [];
+            $decodeArtisanOutput = json_decode($executeArtisan, true);
+            if (!empty($decodeArtisanOutput)) {
+                return $decodeArtisanOutput;
+            }
+        } catch (\Exception $e) {
 
-        $executeArtisan = $this->shellExecutor->executeCommand([
-            'php',
-            '-d memory_limit=512M',
-            $this->path . '/artisan',
-            'microweber:reload_database',
-        ]);
+        }
 
-        $executeArtisan = $this->shellExecutor->executeCommand([
-            'php',
-            '-d memory_limit=512M',
-            $this->path . '/artisan',
-            'microweber:get-templates',
-        ]);
-
-        dd($executeArtisan);
-
-        return $templates;
+        return [];
     }
 
     /**
@@ -173,28 +149,23 @@ class MicroweberAppPathHelper
      */
     public function getSupportedLanguages()
     {
-        $languages = [];
+        try {
+            $executeArtisan = $this->shellExecutor->executeCommand([
+                'php',
+                '-d memory_limit=512M',
+                $this->path . '/artisan',
+                'microweber:get-languages',
+            ]);
 
-        $languagesPath = $this->path . '/userfiles/modules/microweber/language';
-
-        if ($this->fileManager->fileExists($languagesPath)) {
-            $listDir = $this->fileManager->scandir($languagesPath, true);
-            foreach ($listDir as $file) {
-                $ext = $this->fileManager->fileExtension($file);
-                if ($ext == 'json') {
-
-                    $upperText = str_replace('.json', false, $file);
-                    $upperText = strtoupper($upperText);
-
-                    $languages[trim(strtolower($upperText))] = $upperText;
-                }
+            $decodeArtisanOutput = json_decode($executeArtisan, true);
+            if (!empty($decodeArtisanOutput)) {
+                return $decodeArtisanOutput;
             }
-        } else {
-            $languages['en'] = 'EN';
+        } catch (\Exception $e) {
+
         }
 
-        asort($languages);
-        return $languages;
+        return [];
     }
 
 
