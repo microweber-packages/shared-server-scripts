@@ -4,7 +4,7 @@ namespace MicroweberPackages\SharedServerScripts;
 
 use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
 
-class MicroweberInstallationsRecursiveScanner
+class MicroweberInstallationsScanner
 {
     /**
      * @var
