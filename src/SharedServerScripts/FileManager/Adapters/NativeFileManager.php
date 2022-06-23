@@ -186,9 +186,9 @@ class NativeFileManager implements IFileManager
 
         foreach ($files as $fileinfo) {
             $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
-            $todo($fileinfo->getRealPath());
+            @$todo($fileinfo->getRealPath());
         }
 
-        rmdir($dir);
+        @rmdir($dir);
     }
 }
