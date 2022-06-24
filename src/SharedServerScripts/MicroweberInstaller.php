@@ -313,7 +313,7 @@ class MicroweberInstaller {
         $installArguments[] = '--db_host='.  $this->databaseHost;
         $installArguments[] = '--db_name='.  $this->databaseName;
         $installArguments[] = '--db_user='.  $this->databaseUsername;
-        $installArguments[] = '--db_password="'.  $this->databasePassword.'"';
+        $installArguments[] = '--db_password='.  $this->databasePassword;
         $installArguments[] = '--db_driver='.  $this->databaseDriver;
 
         if ($this->language) {
