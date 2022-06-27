@@ -217,7 +217,7 @@ class MicroweberAppPathHelper
             return $token;
 
         } catch (\Exception $e) {
-
+            // error
         }
 
         return false;
