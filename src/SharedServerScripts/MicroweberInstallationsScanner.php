@@ -85,8 +85,9 @@ class MicroweberInstallationsScanner
             'is_symlink'=>$sharedPathHelper->isSymlink(),
             'version'=>$sharedPathHelper->getCurrentVersion(),
             'installed'=>$sharedPathHelper->isInstalled(),
-            'installed_templates'=>$sharedPathHelper->getSupportedTemplates(),
-            'installed_languages'=>$sharedPathHelper->getSupportedLanguages(),
+            'supported_modules'=>$sharedPathHelper->getSupportedModules(),
+            'supported_templates'=>$sharedPathHelper->getSupportedTemplates(),
+            'supported_languages'=>$sharedPathHelper->getSupportedLanguages(),
             'created_at'=>$createdAt
         ];
     }
