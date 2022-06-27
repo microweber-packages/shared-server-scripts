@@ -56,7 +56,7 @@ class MicroweberInstallationsScanner
                 continue;
             }
 
-            $scanPath = dirname(dirname($file->getPathname())) . '/';
+            $scanPath = dirname(dirname($file->getPathname()));
 
             $installation = $this->scanPath($scanPath);
 
