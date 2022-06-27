@@ -134,6 +134,25 @@ class MicroweberAppPathHelper
      */
     public function getSupportedTemplates()
     {
+
+        if (!$this->isInstalled()) {
+            $templates = [];
+            $scan = $this->fileManager->scanDir($this->path . '/userfiles/templates');
+            if (!empty($scan)) {
+                foreach ($scan as $dir) {
+                    if ($dir == '.' || $dir == '..') {
+                        continue;
+                    }
+                    $templates[] = [
+                      'name'=>ucfirst($dir),
+                      'targetDir'=>$dir,
+                    ];
+                }
+            }
+
+            return $templates;
+        }
+
         try {
             $executeArtisan = $this->shellExecutor->executeCommand([
                 'php',
