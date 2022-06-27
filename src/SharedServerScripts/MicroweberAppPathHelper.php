@@ -146,6 +146,7 @@ class MicroweberAppPathHelper
                     $templates[] = [
                       'name'=>ucfirst($dir),
                       'targetDir'=>$dir,
+                      'version'=>false,
                     ];
                 }
             }
