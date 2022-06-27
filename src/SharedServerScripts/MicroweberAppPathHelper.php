@@ -207,14 +207,14 @@ class MicroweberAppPathHelper
     public function loginAsAdmin()
     {
         try {
-            $executeArtisan = $this->shellExecutor->executeCommand([
+            $autoLoginUrl = $this->shellExecutor->executeCommand([
                 'php',
                 '-d memory_limit=512M',
                 $this->path . '/artisan',
-                'microweber:generate-admin-login-token'
+                'microweber:generate-admin-login-token-url'
             ]);
 
-            return $executeArtisan;
+            return $autoLoginUrl;
 
         } catch (\Exception $e) {
 
