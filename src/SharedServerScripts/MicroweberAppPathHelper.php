@@ -177,6 +177,23 @@ class MicroweberAppPathHelper
      */
     public function getSupportedLanguages()
     {
+        if (!$this->isInstalled()) {
+            $languages = [];
+            $scan = $this->fileManager->scanDir($this->path . '/src/MicroweberPackages/Translation/resources/lang');
+            if (!empty($scan)) {
+                foreach ($scan as $dir) {
+                    if ($dir == '.' || $dir == '..') {
+                        continue;
+                    }
+                    $languageAbr = str_replace('.json', false, $dir);
+                    $upperText = strtoupper($languageAbr);
+                    $languages[trim($languageAbr)] = $upperText;
+                }
+            }
+
+            return $languages;
+        }
+
         try {
             $executeArtisan = $this->shellExecutor->executeCommand([
                 'php',
