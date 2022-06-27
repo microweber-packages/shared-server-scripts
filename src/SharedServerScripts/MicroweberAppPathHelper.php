@@ -177,5 +177,50 @@ class MicroweberAppPathHelper
         return [];
     }
 
+    /**
+     * @return false|string
+     */
+    public function enableAdminLoginWithToken()
+    {
+        try {
+              $executeArtisan = $this->shellExecutor->executeCommand([
+                  'php',
+                  '-d memory_limit=512M',
+                  $this->path . '/artisan',
+                  'microweber:module',
+                  'login-with-token',
+                  '1',
+              ]);
+
+            return $executeArtisan;
+
+        } catch (\Exception $e) {
+
+        }
+
+        return false;
+    }
+
+    /**
+     * @return false|string
+     */
+    public function loginAsAdmin()
+    {
+        try {
+            $executeArtisan = $this->shellExecutor->executeCommand([
+                'php',
+                '-d memory_limit=512M',
+                $this->path . '/artisan',
+                'microweber:generate-admin-login-token'
+            ]);
+
+            return $executeArtisan;
+
+        } catch (\Exception $e) {
+
+        }
+
+        return false;
+    }
 
 }
