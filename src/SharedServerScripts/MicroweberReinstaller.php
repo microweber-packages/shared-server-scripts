@@ -7,6 +7,8 @@ class MicroweberReinstaller extends MicroweberInstaller {
 
     public function run()
     {
+        return;
+        
         // First we will make a directories
         foreach ($this->_getDirsToMake() as $dir) {
             if (!$this->fileManager->isDir($this->path . '/' . $dir)) {
@@ -69,5 +71,5 @@ class MicroweberReinstaller extends MicroweberInstaller {
 
     }
 
-    
+
 }
