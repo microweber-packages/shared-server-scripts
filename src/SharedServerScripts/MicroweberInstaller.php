@@ -264,6 +264,10 @@ class MicroweberInstaller {
         foreach ($this->_getFilesForSymlinking() as $folder) {
 
             $sourceDirOrFile = $this->sourcePath . '/' . $folder;
+            if (!$this->fileManager->isFile($sourceDirOrFile)) {
+                continue;
+            }
+
             $targetDirOrFile = $this->path . '/' . $folder;
 
             if ($this->type == self::TYPE_SYMLINK) {
@@ -469,6 +473,7 @@ class MicroweberInstaller {
         $files[] = 'resources';
         $files[] = 'database';
         $files[] = 'userfiles/elements';
+        $files[] = 'storage/settings.json';
 
 
         $listTemplates = $this->fileManager->scanDir($this->sourcePath . '/userfiles/templates');
