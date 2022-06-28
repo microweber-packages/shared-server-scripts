@@ -424,7 +424,7 @@ class MicroweberInstaller {
 
     }
 
-    private function _getDirsToMake() {
+    public function _getDirsToMake() {
 
         $dirs = [];
 
@@ -450,7 +450,7 @@ class MicroweberInstaller {
         return $dirs;
     }
 
-    private function _getDirsToCopy() {
+    public function _getDirsToCopy() {
 
         $dirs = [];
 
@@ -460,7 +460,7 @@ class MicroweberInstaller {
         return $dirs;
     }
 
-    private function _getFilesForSymlinking() {
+    public function _getFilesForSymlinking() {
 
         $files = [];
         $files[] = 'vendor';
@@ -498,7 +498,7 @@ class MicroweberInstaller {
      * This is the files when symlinking app.
      * @return string[]
      */
-    private function _getFilesForCopy() {
+    public function _getFilesForCopy() {
 
         $files = [];
 
