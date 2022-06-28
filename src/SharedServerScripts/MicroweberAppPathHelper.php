@@ -238,6 +238,25 @@ class MicroweberAppPathHelper
         return false;
     }
 
+    public function getAppDetails()
+    {
+        try {
+            $executeArtisan = $this->shellExecutor->executeCommand([
+                'php',
+                '-d memory_limit=512M',
+                $this->path . '/artisan',
+                'microweber:get-app-details',
+            ]);
+            $decodeArtisanOutput = json_decode($executeArtisan, true);
+            if (!empty($decodeArtisanOutput)) {
+                return $decodeArtisanOutput;
+            }
+        } catch (\Exception $e) {
+
+        }
+        return false;
+    }
+
     /**
      * @return false|string
      */

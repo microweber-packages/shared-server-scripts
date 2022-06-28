@@ -84,6 +84,7 @@ class MicroweberInstallationsScanner
             'path'=>$path,
             'is_symlink'=>$sharedPathHelper->isSymlink(),
             'version'=>$sharedPathHelper->getCurrentVersion(),
+            'app_details'=>$sharedPathHelper->getAppDetails(),
             'installed'=>$sharedPathHelper->isInstalled(),
             'supported_modules'=>$sharedPathHelper->getSupportedModules(),
             'supported_templates'=>$sharedPathHelper->getSupportedTemplates(),
