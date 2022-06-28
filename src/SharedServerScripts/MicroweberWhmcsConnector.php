@@ -91,7 +91,8 @@ class MicroweberWhmcsConnector
     {
         $template = 'new-world';
         $url = $this->url . '/index.php?m=microweber_addon&function=get_domain_template_config&domain=' . $this->domainName;
-        $content = $this->fileManager->fileGetContents($url);
+        $content = $this->curlRequest($url);
+
         $json = json_decode($content, true);
 
         if (isset($json['template'])) {
@@ -113,6 +114,27 @@ class MicroweberWhmcsConnector
         }
 
         return $settings;
+    }
+
+    public function curlRequest($url, $postFields = [])
+    {
+        $ch = curl_init();
+        curl_setopt($ch, CURLOPT_URL, $url);
+
+        if (!empty($postFields)) {
+            curl_setopt($ch, CURLOPT_POST, 1);
+            curl_setopt($ch, CURLOPT_POSTFIELDS, $postFields);
+        }
+
+        curl_setopt($ch, CURLOPT_TIMEOUT, 20);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, false);
+
+        $data = curl_exec($ch);
+
+        curl_close($ch);
+
+        return $data;
     }
 
 }
