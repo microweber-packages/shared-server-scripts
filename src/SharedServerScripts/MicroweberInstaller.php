@@ -264,7 +264,7 @@ class MicroweberInstaller {
         foreach ($this->_getFilesForSymlinking() as $folder) {
 
             $sourceDirOrFile = $this->sourcePath . '/' . $folder;
-            if (!$this->fileManager->isFile($sourceDirOrFile)) {
+            if (!$this->fileManager->isFile($sourceDirOrFile) || !$this->fileManager->isDir($sourceDirOrFile)) {
                 continue;
             }
 
