@@ -21,6 +21,12 @@ class MicroweberReinstaller extends MicroweberInstaller {
 
             if ($this->type == self::TYPE_SYMLINK) {
                 // Create symlink
+                if ($this->fileManager->isFile($targetDirOrFile)) {
+                    $this->fileManager->unlink($targetDirOrFile);
+                } else {
+                    $this->fileManager->rmdirRecursive($targetDirOrFile);
+                }
+
                 $this->fileManager->symlink($sourceDirOrFile, $targetDirOrFile);
             } else {
                 if ($this->fileManager->isDir($sourceDirOrFile)) {

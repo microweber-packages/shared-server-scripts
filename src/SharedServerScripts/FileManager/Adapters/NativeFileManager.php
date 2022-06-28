@@ -174,6 +174,15 @@ class NativeFileManager implements IFileManager
     }
 
     /**
+     * @param $file
+     * @return bool
+     */
+    public function rmdir($file)
+    {
+        return rmdir($file);
+    }
+
+    /**
      * @param $dir
      * @return bool
      */
