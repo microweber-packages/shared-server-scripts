@@ -76,15 +76,14 @@ class MicroweberWhmcsConnector
 
         $whmcsJson = json_encode($whmcsJson, JSON_PRETTY_PRINT);
 
-        $whmFilePath = $this->path . 'userfiles/modules/whmcs-connector/';
+        $whmFilePath = $this->path . '/userfiles/modules/whmcs-connector/';
         $whmFileName = 'settings.json';
 
-        if (!$this->fileManager->isFile($whmFilePath)) {
+        if (!$this->fileManager->isDir($whmFilePath)) {
             $this->fileManager->mkdir($whmFilePath, null, true);
         }
 
-        $this->fileManager->filePutContents($whmFilePath . $whmFileName, $whmcsJson);
-
+        return $this->fileManager->filePutContents($whmFilePath . $whmFileName, $whmcsJson);
     }
 
     public function getSelectedTemplateFromWhmcsUser()
