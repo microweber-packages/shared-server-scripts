@@ -91,7 +91,8 @@ class MicroweberWhmcsConnector
     {
         $template = 'new-world';
         $url = $this->url . '/index.php?m=microweber_addon&function=get_domain_template_config&domain=' . $this->domainName;
-        $json = $this->fileManager->fileGetContents($url);
+        $content = $this->fileManager->fileGetContents($url);
+        $json = json_decode($content, true);
 
         if (isset($json['template'])) {
             $template = $json['template'];
