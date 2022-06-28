@@ -359,7 +359,7 @@ class MicroweberInstaller {
 
     }
 
-    private function _chownFolders()
+    public function _chownFolders()
     {
         if ($this->chownAfterInstall) {
 

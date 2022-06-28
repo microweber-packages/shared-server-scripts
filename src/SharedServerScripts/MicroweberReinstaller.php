@@ -57,11 +57,7 @@ class MicroweberReinstaller extends MicroweberInstaller {
             $this->fileManager->copy($sourceFile, $targetFile);
         }
 
-
-    /*    $dirs = $this->fileManager->scanDir($this->path);
-
-        dd($dirs);*/
-
+        $this->_chownFolders();
 
     }
 
