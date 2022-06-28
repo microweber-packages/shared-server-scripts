@@ -32,9 +32,11 @@ class MicroweberReinstaller extends MicroweberInstaller {
                 if ($this->fileManager->isDir($sourceDirOrFile)) {
 
                     // if dir exist we will skip copy folder
-                    if (!$this->fileManager->isDir($targetDirOrFile)) {
-                        $this->fileManager->copyFolder($sourceDirOrFile, $targetDirOrFile);
+                    if ($this->fileManager->isDir($targetDirOrFile)) {
+                        $this->fileManager->rmdirRecursive($targetDirOrFile);
                     }
+
+                    $this->fileManager->copyFolder($sourceDirOrFile, $targetDirOrFile);
 
                 } else {
                     $this->fileManager->copy($sourceDirOrFile, $targetDirOrFile);
@@ -67,6 +69,5 @@ class MicroweberReinstaller extends MicroweberInstaller {
 
     }
 
-
-
+    
 }
