@@ -261,14 +261,10 @@ class MicroweberInstaller {
             $this->fileManager->mkdir($this->path . '/' . $dir, '0755', true);
         }
 
-        foreach ($this->_getFilesForSymlinking() as $folder) {
+        foreach ($this->_getFilesForSymlinking() as $fileOrFolder) {
 
-            $sourceDirOrFile = $this->sourcePath . '/' . $folder;
-            if (!$this->fileManager->isFile($sourceDirOrFile) || !$this->fileManager->isDir($sourceDirOrFile)) {
-                continue;
-            }
-
-            $targetDirOrFile = $this->path . '/' . $folder;
+            $sourceDirOrFile = $this->sourcePath . '/' . $fileOrFolder;
+            $targetDirOrFile = $this->path . '/' . $fileOrFolder;
 
             if ($this->type == self::TYPE_SYMLINK) {
                 // Create symlink
@@ -467,14 +463,13 @@ class MicroweberInstaller {
     private function _getFilesForSymlinking() {
 
         $files = [];
-        $files[] = 'version.txt';
         $files[] = 'vendor';
         $files[] = 'src';
         $files[] = 'resources';
         $files[] = 'database';
         $files[] = 'userfiles/elements';
         $files[] = 'storage/settings.json';
-
+        $files[] = 'version.txt';
 
         $listTemplates = $this->fileManager->scanDir($this->sourcePath . '/userfiles/templates');
         if (!empty($listTemplates)) {
