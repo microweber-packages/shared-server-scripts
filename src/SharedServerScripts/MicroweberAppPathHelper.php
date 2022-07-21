@@ -179,8 +179,12 @@ class MicroweberAppPathHelper
     public function getSupportedLanguages()
     {
         if (!$this->isInstalled()) {
+            $langDir = $this->path . '/src/MicroweberPackages/Translation/resources/lang';
+            if (!$this->fileManager->isDir($langDir)) {
+                return [];
+            }
             $languages = [];
-            $scan = $this->fileManager->scanDir($this->path . '/src/MicroweberPackages/Translation/resources/lang');
+            $scan = $this->fileManager->scanDir($langDir);
             if (!empty($scan)) {
                 foreach ($scan as $dir) {
                     if ($dir == '.' || $dir == '..') {

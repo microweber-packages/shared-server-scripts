@@ -1,6 +1,8 @@
 <?php
 namespace MicroweberPackages\SharedServerScripts\FileManager\Adapters;
 
+use Mockery\Exception;
+
 class NativeFileManager implements IFileManager
 {
 
@@ -161,7 +163,13 @@ class NativeFileManager implements IFileManager
      */
     public function symlink($target, $link)
     {
-        return symlink($target, $link);
+        try {
+            $exec = symlink($target, $link);
+        } catch (\Exception $e) {
+            throw new \Exception(json_encode(['args'=> func_get_args(),'message'=>$e->getMessage()], JSON_PRETTY_PRINT));
+        }
+
+        return $exec;
     }
 
     /**

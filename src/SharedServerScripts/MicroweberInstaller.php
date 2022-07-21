@@ -477,7 +477,7 @@ class MicroweberInstaller {
                 if ($template == '.' || $template == '..') {
                     continue;
                 }
-                $files[] = '/userfiles/templates/' . $template;
+                $files[] = 'userfiles/templates/' . $template;
             }
         }
 
@@ -487,7 +487,7 @@ class MicroweberInstaller {
                 if ($module == '.' || $module == '..') {
                     continue;
                 }
-                $files[] = '/userfiles/modules/' . $module;
+                $files[] = 'userfiles/modules/' . $module;
             }
         }
 
