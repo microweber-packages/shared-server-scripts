@@ -310,26 +310,26 @@ class MicroweberInstaller {
         $installArguments[] =  '--password='.  $this->adminPassword;
 
         // Database settings
-        $installArguments[] = '--db_host='.  $this->databaseHost;
-        $installArguments[] = '--db_name='.  $this->databaseName;
-        $installArguments[] = '--db_username='.  $this->databaseUsername;
-        $installArguments[] = '--db_password='.  $this->databasePassword;
-        $installArguments[] = '--db_driver='.  $this->databaseDriver;
+        $installArguments[] = '--db-host='.  $this->databaseHost;
+        $installArguments[] = '--db-name='.  $this->databaseName;
+        $installArguments[] = '--db-username='.  $this->databaseUsername;
+        $installArguments[] = '--db-password='.  $this->databasePassword;
+        $installArguments[] = '--db-driver='.  $this->databaseDriver;
 
         if ($this->language) {
             $installArguments[] = '--language='.  trim($this->language);
         }
 
-        $installArguments[] = '--db_prefix=site_';
+        $installArguments[] = '--db-prefix=site_';
 
         if ($this->template) {
             $installArguments[] = '--template='. $this->template;
         }
 
-        $installArguments[] = '--default_content=1';
+        $installArguments[] = '--default-content=1';
 
         if (!$this->template) {
-            $installArguments[] = '--config_only=1';
+            $installArguments[] = '--config-only=1';
         }
 
         try {
