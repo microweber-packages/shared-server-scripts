@@ -38,6 +38,8 @@ class MicroweberReinstaller extends MicroweberInstaller {
 
     public function runStandaloneReinstall()
     {
+        $this->enableChownAfterInstall();
+
         foreach ($this->_getFilesForSymlinking() as $fileOrFolder) {
 
             $sourceDirOrFile = $this->sourcePath . '/' . $fileOrFolder;
