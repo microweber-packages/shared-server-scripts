@@ -38,6 +38,22 @@ class MicroweberReinstaller extends MicroweberInstaller {
 
     public function runStandaloneReinstall()
     {
+        foreach ($this->_getFilesForSymlinking() as $fileOrFolder) {
 
+            $sourceDirOrFile = $this->sourcePath . '/' . $fileOrFolder;
+            $targetDirOrFile = $this->path . '/' . $fileOrFolder;
+
+            // Delete
+            if ($this->fileManager->isDir($sourceDirOrFile)) {
+                if ($this->fileManager->isDir($targetDirOrFile)) {
+                    $this->fileManager->rmdirRecursive($targetDirOrFile);
+                }
+
+                $this->fileManager->copyFolder($sourceDirOrFile, $targetDirOrFile);
+            }
+
+        }
+
+        $this->_chownFolders();
     }
 }
