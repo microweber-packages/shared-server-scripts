@@ -550,9 +550,13 @@ class MicroweberInstaller {
     {
         $stat = stat($file);
         if ($stat) {
-            $group = posix_getgrgid($stat[5]);
+
+            // $group = posix_getgrgid($stat[5]);
             $user = posix_getpwuid($stat[4]);
-            return compact('user', 'group');
+
+            if (isset($user['name'])) {
+                return $user['name'];
+            }
         }
 
     }
