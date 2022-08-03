@@ -19,10 +19,13 @@ class MicroweberDownloader implements IMicroweberDownloader {
      */
     public $shellExecutor;
 
+    const DEV_RELEASE = 'dev';
+    const STABLE_RELEASE = 'stable';
+
     /**
      * @var string
      */
-    public $realeaseSource = 'dev';
+    public $realeaseSource = self::STABLE_RELEASE;
 
     /**
      * @var Client
@@ -72,7 +75,15 @@ class MicroweberDownloader implements IMicroweberDownloader {
      */
     public function setReleaseSource($source)
     {
-        $this->realeaseSource = $source;
+        if ($source == self::DEV_RELEASE) {
+            $this->realeaseSource = $source;
+        }
+
+        if ($source == self::STABLE_RELEASE) {
+            $this->realeaseSource = $source;
+        }
+
+        throw new \Exception('Please, use constants');
     }
 
     /**
@@ -138,10 +149,8 @@ class MicroweberDownloader implements IMicroweberDownloader {
      */
     public function getRelease()
     {
-        if ($this->realeaseSource == 'dev') {
-
+        if ($this->realeaseSource == self::DEV_RELEASE) {
             $branch = 'dev';
-
             return [
                 'version'=>'Latest development version',
                 'composer_url'=>'http://updater.microweberapi.com/builds/'.$branch.'/composer.json',
