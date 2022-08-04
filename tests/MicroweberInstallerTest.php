@@ -28,7 +28,7 @@ class MicroweberInstallerTest extends TestCase
         $installer->setAdminUsername('bobi_unittest');
         $installer->setAdminPassword('unitest-pass');
         $installer->setAdminEmail('bobi@unitest.com');
-        $installer->setStandaloneInstallation();
+        $installer->setSymlinkInstallation();
 
         $status = $installer->run();
 
