@@ -343,7 +343,7 @@ class MicroweberInstaller {
                 'microweber:install',
             ], $installArguments);
 
-            $executeArtisan = $this->shellExecutor->executeCommand($artisanCommand);
+            $executeArtisan = $this->shellExecutor->executeCommand($artisanCommand, $this->path);
 
             $this->_chownFolders();
 

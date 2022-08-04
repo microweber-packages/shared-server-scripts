@@ -1,8 +1,6 @@
 <?php
 namespace MicroweberPackages\SharedServerScripts\Shell\Adapters;
 
-use Symfony\Component\Process\Process;
-
 class NativeShellExecutor implements IShellExecutor
 {
     /**
@@ -19,12 +17,10 @@ class NativeShellExecutor implements IShellExecutor
         return $this->executeCommand($processArgs);
     }
 
-    public function executeCommand(array $args)
+    public function executeCommand(array $args, $cwd = null)
     {
-        $process = new Process($args);
-        $process->setTimeout(100000);
-        $process->mustRun();
-
-        return $process->getOutput();
+        $args = implode(' ', array_map('escapeshellarg', $args));
+        $exec = shell_exec($args);
+        return $exec;
     }
 }
