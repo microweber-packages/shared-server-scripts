@@ -42,8 +42,8 @@ class MicroweberUninstaller {
 
     public function run()
     {
-
         $files = $this->_getFilesForDelete();
+
         foreach ($files as $file) {
             $deleteFile = $this->path . $file;
             if ($this->fileManager->isFile($deleteFile)) {
@@ -58,6 +58,8 @@ class MicroweberUninstaller {
                 $this->fileManager->rmdirRecursive($deleteDir);
             }
         }
+
+        return ['done'=>true];
     }
 
 
