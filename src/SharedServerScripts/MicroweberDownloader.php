@@ -76,11 +76,11 @@ class MicroweberDownloader implements IMicroweberDownloader {
     public function setReleaseSource($source)
     {
         if ($source == self::DEV_RELEASE) {
-            $this->realeaseSource = $source;
+            return $this->realeaseSource = $source;
         }
 
         if ($source == self::STABLE_RELEASE) {
-            $this->realeaseSource = $source;
+            return $this->realeaseSource = $source;
         }
 
         throw new \Exception('Please, use constants');
