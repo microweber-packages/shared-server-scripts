@@ -343,7 +343,12 @@ class MicroweberInstaller {
                 'microweber:install',
             ], $installArguments);
 
-            $executeArtisan = $this->shellExecutor->executeCommand($artisanCommand, $this->path);
+            $executeArtisan = $this->shellExecutor->executeCommand($artisanCommand, $this->path, [
+                'APP_ENV' => false,
+                'DB_CONNECTION' => false,
+                'APP_KEY' => false,
+                'SYMFONY_DOTENV_VARS' => false,
+            ]);
 
             $this->_chownFolders();
 
