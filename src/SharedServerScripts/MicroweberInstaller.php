@@ -475,7 +475,7 @@ class MicroweberInstaller {
         $files[] = 'vendor';
         $files[] = 'src';
         $files[] = 'resources';
-        $files[] = 'database/migrations';
+        $files[] = 'database';
         $files[] = 'userfiles/elements';
         $files[] = 'storage/settings.json';
         $files[] = 'version.txt';
