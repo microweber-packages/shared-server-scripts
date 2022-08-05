@@ -94,7 +94,7 @@ class MicroweberDownloader implements IMicroweberDownloader {
     {
         // Validate target path
         if (!$this->fileManager->isDir(dirname($target))) {
-            throw new \Exception('Parent folder of target path is not valid.');
+            throw new \Exception('Parent folder of target path is not valid.' . dirname($target));
         }
 
         if (!$this->fileManager->isWritable(dirname($target))) {

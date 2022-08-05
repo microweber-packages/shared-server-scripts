@@ -136,8 +136,14 @@ class MicroweberAppPathHelper
     {
 
         if (!$this->isInstalled()) {
+
             $templates = [];
-            $scan = $this->fileManager->scanDir($this->path . '/userfiles/templates');
+            $templatePath = $this->path . '/userfiles/templates';
+            if (!$this->fileManager->isDir($templatePath)) {
+                return [];
+            }
+
+            $scan = $this->fileManager->scanDir($templatePath);
             if (!empty($scan)) {
                 foreach ($scan as $dir) {
                     if ($dir == '.' || $dir == '..') {
