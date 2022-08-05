@@ -189,7 +189,11 @@ class MicroweberAppPathHelper
             if (!$this->fileManager->isDir($langDir)) {
                 return [];
             }
-            $languages = [];
+            $languages = [
+                'en_US'=>'EN_US',
+                'bg_BG'=>'BG_BG',
+                'ar_SA'=>'AR_SA'
+            ];
             $scan = $this->fileManager->scanDir($langDir);
             if (!empty($scan)) {
                 foreach ($scan as $dir) {
