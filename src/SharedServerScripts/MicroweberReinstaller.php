@@ -75,6 +75,19 @@ class MicroweberReinstaller extends MicroweberInstaller {
 
         }
 
+        // And then we will copy files
+        foreach ($this->_getFilesForCopy() as $file) {
+
+            $sourceDirOrFile = $this->sourcePath .'/'. $file;
+            $targetDirOrFile = $this->path .'/'. $file;
+
+            if ($this->fileManager->isFile($targetDirOrFile)) {
+                unlink($targetDirOrFile);
+            }
+
+            $this->fileManager->copy($sourceDirOrFile, $targetDirOrFile);
+        }
+
         $this->_chownFolders();
     }
 }
