@@ -202,10 +202,23 @@ class NativeFileManager implements IFileManager
         );
 
         foreach ($files as $fileinfo) {
-            $todo = ($fileinfo->isDir() ? 'rmdir' : 'unlink');
-            @$todo($fileinfo->getRealPath());
+
+            if ($fileinfo->isLink()) {
+                unlink($fileinfo->getPathName()); // must be path name, cause will delete the source of symlink
+            }
+
+            if ($fileinfo->isDir()) {
+                rmdir($fileinfo->getRealPath());
+            }
+
+            if ($fileinfo->isFile()) {
+                unlink($fileinfo->getRealPath());
+            }
         }
 
-        @rmdir($dir);
+        if (is_dir($dir)) {
+            rmdir($dir);
+        }
+
     }
 }
