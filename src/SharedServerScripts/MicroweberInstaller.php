@@ -266,6 +266,10 @@ class MicroweberInstaller {
             $sourceDirOrFile = $this->sourcePath . '/' . $fileOrFolder;
             $targetDirOrFile = $this->path . '/' . $fileOrFolder;
 
+            if (!$this->fileManager->fileExists($sourceDirOrFile)) {
+                continue;
+            }
+
             if ($this->type == self::TYPE_SYMLINK) {
                 // Create symlink
                 $this->fileManager->symlink($sourceDirOrFile, $targetDirOrFile);
