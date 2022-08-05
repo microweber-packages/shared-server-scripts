@@ -35,6 +35,10 @@ class MicroweberReinstaller extends MicroweberInstaller {
                 $this->fileManager->rmdirRecursive($targetDirOrFile);
             }
 
+            if ($this->fileManager->isFile($targetDirOrFile)) {
+                $this->fileManager->unlink($targetDirOrFile);
+            }
+
             // Create symlink
             $this->fileManager->symlink($sourceDirOrFile, $targetDirOrFile);
         }
@@ -51,12 +55,21 @@ class MicroweberReinstaller extends MicroweberInstaller {
             $sourceDirOrFile = $this->sourcePath . '/' . $fileOrFolder;
             $targetDirOrFile = $this->path . '/' . $fileOrFolder;
 
-            // Delete
+            // Delete symlink
+            if ($this->fileManager->isLink($targetDirOrFile)) {
+                $this->fileManager->unlink($targetDirOrFile);
+            }
+
+            // Delete file
+            if ($this->fileManager->isFile($targetDirOrFile)) {
+                $this->fileManager->unlink($targetDirOrFile);
+            }
+
+            // Delete folder
             if ($this->fileManager->isDir($sourceDirOrFile)) {
                 if ($this->fileManager->isDir($targetDirOrFile)) {
                     $this->fileManager->rmdirRecursive($targetDirOrFile);
                 }
-
                 $this->fileManager->copyFolder($sourceDirOrFile, $targetDirOrFile);
             }
 
