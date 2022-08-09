@@ -43,6 +43,8 @@ class MicroweberReinstaller extends MicroweberInstaller {
             $this->fileManager->symlink($sourceDirOrFile, $targetDirOrFile);
         }
 
+        $this->addMissingConfigFiles();
+
         $this->_chownFolders();
     }
 
@@ -88,6 +90,56 @@ class MicroweberReinstaller extends MicroweberInstaller {
             $this->fileManager->copy($sourceDirOrFile, $targetDirOrFile);
         }
 
+        $this->addMissingConfigFiles();
+
         $this->_chownFolders();
     }
+
+    public function addMissingConfigFiles()
+    {
+        $sourceDirOfConfigs = [];
+        $sourceDirOfConfigsList = $this->fileManager->scanDir($this->sourcePath . '/config');
+        if (!empty($sourceDirOfConfigsList)) {
+            foreach ($sourceDirOfConfigsList as $configFile) {
+                if ($configFile == '.' || $configFile == '..') {
+                    continue;
+                }
+                $sourceDirOfConfigs[] = $configFile;
+            }
+        }
+
+
+        $targetDirOfConfigs = [];
+        $targetDirOfConfigsList = $this->fileManager->scanDir($this->path . '/config');
+        if (!empty($targetDirOfConfigsList)) {
+            foreach ($targetDirOfConfigsList as $targetConfigFile) {
+                if ($targetConfigFile == '.' || $targetConfigFile == '..') {
+                    continue;
+                }
+                $targetDirOfConfigs[] = $targetConfigFile;
+            }
+        }
+
+
+        $missingConfigs = [];
+        foreach ($sourceDirOfConfigs as $sourceConfig) {
+            if (!in_array($sourceConfig, $targetDirOfConfigs)) {
+                $missingConfigs[] = $sourceConfig;
+            }
+        }
+
+        if (!empty($missingConfigs)) {
+            foreach ($missingConfigs as $missingConfig) {
+
+                $sourceConfigFile = $this->sourcePath . '/config/'.$missingConfig;
+                $targetConfigFile = $this->path .'/config/' . $missingConfig;
+
+                if (!$this->fileManager->fileExists($targetConfigFile)) {
+                    $this->fileManager->copy($sourceConfigFile, $targetConfigFile);
+                }
+            }
+        }
+
+    }
+
 }
