@@ -1,7 +1,7 @@
 <?php
 namespace MicroweberPackages\SharedServerScripts\FileManager\Adapters;
 
-class PleskFileManager implements IFileManager
+class PleskDomainFileManager implements IFileManager
 {
     /**
      * @var \pm_FileManager
