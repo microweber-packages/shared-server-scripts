@@ -37,4 +37,11 @@ interface IFileManager
      */
     public function copy(string $from, string $to);
 
+
+    /**
+     * @param string $file
+     * @return mixed
+     */
+    public function fileExtension(string $file);
+
 }

@@ -43,6 +43,16 @@ class PleskDomainFileManager implements IFileManager
     }
 
     /**
+     * @param $file
+     * @return mixed
+     */
+    public function fileExtension($file)
+    {
+        $file = rtrim($file, '.');
+        return substr($file, strrpos($file, '.') + 1);
+    }
+
+    /**
      * @param $from
      * @param $to
      * @return mixed
