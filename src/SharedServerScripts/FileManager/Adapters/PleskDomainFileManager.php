@@ -14,11 +14,6 @@ class PleskDomainFileManager implements IFileManager
     public $domainId;
 
 
-    public function __construct()
-    {
-        $this->fileManager = new \pm_FileManager($this->domainId);
-    }
-
     /**
      * @param $domainId
      * @return void
@@ -39,6 +34,25 @@ class PleskDomainFileManager implements IFileManager
     }
 
     /**
+     * @param $file
+     * @return mixed
+     */
+    public function fileExists($file)
+    {
+        return $this->fileManager->fileExists($file);
+    }
+
+    /**
+     * @param $from
+     * @param $to
+     * @return mixed
+     */
+    public function copy($from, $to)
+    {
+        return $this->fileManager->copyFile($from, $to);
+    }
+
+    /**
      * @param $dir
      * @return mixed
      */
@@ -47,4 +61,11 @@ class PleskDomainFileManager implements IFileManager
         return $this->fileManager->isWritable($dir);
     }
 
+    /**
+     * @param $dir
+     * @return mixed
+     */
+    public function scanDir($dir) {
+        return $this->fileManager->scanDir($dir);
+    }
 }

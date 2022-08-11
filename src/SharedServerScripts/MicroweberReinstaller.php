@@ -108,7 +108,6 @@ class MicroweberReinstaller extends MicroweberInstaller {
             }
         }
 
-
         $targetDirOfConfigs = [];
         $targetDirOfConfigsList = $this->fileManager->scanDir($this->path . '/config');
         if (!empty($targetDirOfConfigsList)) {
@@ -119,7 +118,6 @@ class MicroweberReinstaller extends MicroweberInstaller {
                 $targetDirOfConfigs[] = $targetConfigFile;
             }
         }
-
 
         $missingConfigs = [];
         foreach ($sourceDirOfConfigs as $sourceConfig) {
