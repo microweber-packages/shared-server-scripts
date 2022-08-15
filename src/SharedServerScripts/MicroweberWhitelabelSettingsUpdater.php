@@ -4,7 +4,7 @@ namespace MicroweberPackages\SharedServerScripts;
 use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
 use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 
-class MicroweberWhitelabelUpdater {
+class MicroweberWhitelabelSettingsUpdater {
 
     /**
      * @var
