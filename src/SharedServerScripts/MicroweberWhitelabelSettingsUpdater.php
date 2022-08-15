@@ -49,7 +49,7 @@ class MicroweberWhitelabelSettingsUpdater {
         $whitelabelJson = json_encode($settings, JSON_PRETTY_PRINT);
 
         $whmFilePath = $this->path . '/storage/';
-        $whmFileName = 'settings.json';
+        $whmFileName = 'branding.json';
 
         if (!$this->fileManager->isDir($whmFilePath)) {
             $this->fileManager->mkdir($whmFilePath, null, true);
