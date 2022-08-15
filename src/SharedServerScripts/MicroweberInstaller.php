@@ -477,7 +477,7 @@ class MicroweberInstaller {
         $files[] = 'resources';
         $files[] = 'database';
         $files[] = 'userfiles/elements';
-        $files[] = 'storage/settings.json';
+        $files[] = 'storage/branding.json';
         $files[] = 'version.txt';
 
         $listTemplates = $this->fileManager->scanDir($this->sourcePath . '/userfiles/templates');
