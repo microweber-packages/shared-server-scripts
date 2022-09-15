@@ -144,6 +144,23 @@ class MicroweberDownloader implements IMicroweberDownloader {
         return $status;
     }
 
+    public function getVersion()
+    {
+        $release = $this->getRelease();
+
+        $releaseVersion = '--';
+
+        if (isset($release['version_url'])) {
+            $ch = curl_init();
+            curl_setopt($ch, CURLOPT_URL, $release['version_url']);
+            curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+
+            $releaseVersion = curl_exec($ch);
+        }
+
+        return $releaseVersion;
+    }
+
     /**
      * @return string[]
      */
