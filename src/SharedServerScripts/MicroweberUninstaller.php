@@ -58,6 +58,11 @@ class MicroweberUninstaller {
         foreach ($dirs as $dir) {
             $deleteDir = $this->path . DIRECTORY_SEPARATOR . $dir;
             if ($this->fileManager->isDir($deleteDir)) {
+                if ($this->fileManager->isLink($deleteDir)) {
+                    $this->fileManager->unlink($deleteDir);
+                    $deletedFiles[] = $file;
+                    continue;
+                }
                 $this->fileManager->rmdirRecursive($deleteDir);
                 $deletedFiles[] = $file;
             }
