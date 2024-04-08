@@ -86,7 +86,7 @@ class MicroweberInstaller {
     /**
      * @var string
      */
-    protected $template = 'new-world';
+    protected $template = null;
 
     /**
      * @var string
@@ -329,9 +329,7 @@ class MicroweberInstaller {
         if (!empty($this->template)) {
             $installArguments[] = '--template='. $this->template;
             $installArguments[] = '--default-content=1';
-        }
-
-        if (!$this->template) {
+        } else {
             $installArguments[] = '--config-only=1';
         }
 
