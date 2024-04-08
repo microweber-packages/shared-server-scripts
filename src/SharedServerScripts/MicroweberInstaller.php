@@ -456,6 +456,9 @@ class MicroweberInstaller {
         $dirs[] = 'userfiles/modules';
         $dirs[] = 'userfiles/templates';
 
+        // Public
+        $dirs[] = 'public';
+
         return $dirs;
     }
 
@@ -477,8 +480,11 @@ class MicroweberInstaller {
         $files[] = 'resources';
         $files[] = 'database';
         $files[] = 'userfiles/elements';
+        $files[] = 'public/build';
         $files[] = 'storage/branding.json';
         $files[] = 'version.txt';
+
+        $files[] = '/userfiles/templates/default';
 
         $listTemplates = $this->fileManager->scanDir($this->sourcePath . '/userfiles/templates');
         if (!empty($listTemplates)) {
