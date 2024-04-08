@@ -329,8 +329,6 @@ class MicroweberInstaller {
         if (!empty($this->template)) {
             $installArguments[] = '--template='. $this->template;
             $installArguments[] = '--default-content=1';
-        } else {
-            $installArguments[] = '--config-only=1';
         }
 
         try {
