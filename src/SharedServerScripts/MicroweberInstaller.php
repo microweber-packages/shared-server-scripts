@@ -326,11 +326,10 @@ class MicroweberInstaller {
 
         $installArguments[] = '--db-prefix=site_';
 
-        if ($this->template) {
+        if (!empty($this->template)) {
             $installArguments[] = '--template='. $this->template;
+            $installArguments[] = '--default-content=1';
         }
-
-        $installArguments[] = '--default-content=1';
 
         if (!$this->template) {
             $installArguments[] = '--config-only=1';
