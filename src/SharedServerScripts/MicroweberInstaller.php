@@ -166,6 +166,14 @@ class MicroweberInstaller {
         $this->databasePassword = $password;
     }
 
+     /**
+     * @param $host
+     * @return void
+     */
+    public function setDatabaseHost($host) {
+        $this->databaseHost = $host;
+    }
+    
     /**
      * @param $name
      * @return void
