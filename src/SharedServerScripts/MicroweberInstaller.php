@@ -173,7 +173,7 @@ class MicroweberInstaller {
     public function setDatabaseHost($host) {
         $this->databaseHost = $host;
     }
-    
+
     /**
      * @param $name
      * @return void
@@ -484,7 +484,7 @@ class MicroweberInstaller {
         $files[] = 'database';
         $files[] = 'userfiles/elements';
         $files[] = 'public/build';
-        $files[] = 'storage/branding.json';
+        $files[] = 'storage/branding_saas.json';
         $files[] = 'version.txt';
 
         $listTemplates = $this->fileManager->scanDir($this->sourcePath . '/userfiles/templates');
