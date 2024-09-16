@@ -66,8 +66,11 @@ class MicroweberWhitelabelWebsiteApply {
         $brandingTargetFile = $this->webPath . '/storage/branding_saas.json';
         $brandingSecondTargetFile = $this->webPath . '/storage/branding.json';
 
-        if ($this->fileManager->fileExists($brandingSourceFile)) {
-            $this->fileManager->unlink($this->webPath . '/storage/branding_saas.json');
+        if ($this->fileManager->fileExists($brandingTargetFile)) {
+            $this->fileManager->unlink($brandingTargetFile);
+        }
+        if ($this->fileManager->fileExists($brandingSecondTargetFile)) {
+            $this->fileManager->unlink($brandingSecondTargetFile);
         }
 
         $this->fileManager->symlink($brandingSourceFile, $brandingTargetFile);
