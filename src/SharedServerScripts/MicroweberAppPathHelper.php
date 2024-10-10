@@ -149,10 +149,21 @@ class MicroweberAppPathHelper
                     if ($dir == '.' || $dir == '..') {
                         continue;
                     }
+                    $fullDir = $templatePath . '/' . $dir;
+                    $templateConfig = $fullDir . '/config.php';
+                    $templateVersion = null;
+                    if ($this->fileManager->fileExists($templateConfig)) {
+                       ob_start();
+                      include $templateConfig;
+                      if (isset($config['version'])) {
+                          $templateVersion = $config['version'];
+                      }
+                      ob_get_clean();
+                    }
                     $templates[] = [
                       'name'=>ucfirst($dir),
                       'targetDir'=>$dir,
-                      'version'=>false,
+                      'version'=>$templateVersion,
                     ];
                 }
             }
