@@ -260,7 +260,7 @@ class MicroweberInstaller {
      *
      * @return void
      */
-    public function setPHPSbin($phpSbin)
+    public function setPhpSbin($phpSbin)
     {
         $this->phpSbin = $phpSbin;
     }
