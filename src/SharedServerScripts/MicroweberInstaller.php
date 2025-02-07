@@ -263,8 +263,6 @@ class MicroweberInstaller {
     public function setPHPSbin($phpSbin)
     {
         $this->phpSbin = $phpSbin;
-
-        dd($this->phpSbin);
     }
 
     public function __construct() {
