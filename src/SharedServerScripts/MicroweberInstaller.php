@@ -94,6 +94,11 @@ class MicroweberInstaller {
     protected $language = 'en';
 
     /**
+     * @var string
+     */
+    protected $phpSbin = 'php';
+
+    /**
      * @param $logger
      * @return void
      */
@@ -250,6 +255,16 @@ class MicroweberInstaller {
         $this->chownAfterInstall = true;
     }
 
+    /**
+     * @param $phpSbin
+     *
+     * @return void
+     */
+    public function setPhpSbin($phpSbin)
+    {
+        $this->phpSbin = $phpSbin;
+    }
+
     public function __construct() {
         $this->fileManager = new NativeFileManager();
         $this->shellExecutor = new NativeShellExecutor();
@@ -344,7 +359,7 @@ class MicroweberInstaller {
             $this->_chownFolders();
 
             $artisanCommand = array_merge([
-                'php',
+               $this->phpSbin,
                 '-d memory_limit=512M',
                 $this->path . '/artisan',
                 'microweber:install',
