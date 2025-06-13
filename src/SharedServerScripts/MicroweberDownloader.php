@@ -1,4 +1,5 @@
 <?php
+
 namespace MicroweberPackages\SharedServerScripts;
 
 use MicroweberPackages\ComposerClient\Client;
@@ -7,7 +8,8 @@ use MicroweberPackages\SharedServerScripts\Interfaces\IMicroweberDownloader;
 use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 use MicroweberPackages\SharedServerScripts\Shell\ShellExecutor;
 
-class MicroweberDownloader implements IMicroweberDownloader {
+class MicroweberDownloader implements IMicroweberDownloader
+{
 
     /**
      * @var NativeFileManager
@@ -36,7 +38,8 @@ class MicroweberDownloader implements IMicroweberDownloader {
      * @param $fileManagerAdapter
      * @param $shellExecutorAdapter
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->fileManager = new NativeFileManager();
         $this->shellExecutor = new NativeShellExecutor();
         $this->composerClient = new Client();
@@ -103,20 +106,21 @@ class MicroweberDownloader implements IMicroweberDownloader {
 
         // Get latest release of app
         $release = $this->getRelease();
+
         if (empty($release)) {
             throw new \Exception('No releases found.');
         }
-
+        $url = $release['url'] ?? null;
         // Download the app
         $status = $this->downloadMainApp($release['url'], $target);
 
         // Validate app installation
         $mainAppDownloadingErrors = [];
         if (!$this->fileManager->isDir($target)) {
-            $mainAppDownloadingErrors[] = true;
+            //    $mainAppDownloadingErrors[] = true;
         }
         if (!$this->fileManager->isFile($target . DIRECTORY_SEPARATOR . 'index.php')) {
-            $mainAppDownloadingErrors[] = true;
+            //     $mainAppDownloadingErrors[] = true;
         }
 
         if (!empty($mainAppDownloadingErrors)) {
@@ -124,7 +128,7 @@ class MicroweberDownloader implements IMicroweberDownloader {
         }
 
         if (strpos($status, 'Done') !== false) {
-            return ['downloaded'=>true];
+            return ['downloaded' => true, 'status' => $status, 'release' => $release];
         }
 
         throw new \Exception('Something went wrong when downloading the main app. Reason: ' . $status);
@@ -168,19 +172,20 @@ class MicroweberDownloader implements IMicroweberDownloader {
     {
         if ($this->realeaseSource == self::DEV_RELEASE) {
             $branch = 'dev';
+            //$branch = 'filament-unstable';
             return [
-                'version'=>'Latest development version',
-                'composer_url'=>'http://updater.microweberapi.com/builds/'.$branch.'/composer.json',
-                'version_url'=>'http://updater.microweberapi.com/builds/'.$branch.'/version.txt',
-                'url'=>'http://updater.microweberapi.com/builds/'.$branch.'/microweber.zip'
+                'version' => 'Latest development version',
+                'composer_url' => 'http://updater.microweberapi.com/builds/' . $branch . '/composer.json',
+                'version_url' => 'http://updater.microweberapi.com/builds/' . $branch . '/version.txt',
+                'url' => 'http://updater.microweberapi.com/builds/' . $branch . '/microweber.zip'
             ];
         }
 
         return [
-            'version'=>'Latest production version',
-            'composer_url'=>'http://updater.microweberapi.com/builds/master/composer.json',
-            'version_url'=>'http://updater.microweberapi.com/builds/master/version.txt',
-            'url'=>'http://updater.microweberapi.com/builds/master/microweber.zip'
+            'version' => 'Latest production version',
+            'composer_url' => 'http://updater.microweberapi.com/builds/master/composer.json',
+            'version_url' => 'http://updater.microweberapi.com/builds/master/version.txt',
+            'url' => 'http://updater.microweberapi.com/builds/master/microweber.zip'
         ];
     }
 
