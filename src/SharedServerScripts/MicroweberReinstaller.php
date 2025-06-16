@@ -54,7 +54,16 @@ class MicroweberReinstaller extends MicroweberInstaller {
 
         foreach ($this->_getFilesForSymlinking() as $fileOrFolder) {
 
+
+
             $sourceDirOrFile = $this->sourcePath . '/' . $fileOrFolder;
+
+            if(!$this->fileManager->isDir($sourceDirOrFile) && !$this->fileManager->isFile($sourceDirOrFile)) {
+                continue; // Skip if source is not a directory or file
+            }
+
+
+
             $targetDirOrFile = $this->path . '/' . $fileOrFolder;
 
             // Delete symlink
@@ -82,6 +91,11 @@ class MicroweberReinstaller extends MicroweberInstaller {
 
             $sourceDirOrFile = $this->sourcePath .'/'. $file;
             $targetDirOrFile = $this->path .'/'. $file;
+
+            if(!$this->fileManager->isDir($sourceDirOrFile) && !$this->fileManager->isFile($sourceDirOrFile)) {
+                continue; // Skip if source is not a directory or file
+            }
+
 
             if ($this->fileManager->isFile($targetDirOrFile)) {
                 unlink($targetDirOrFile);

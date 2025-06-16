@@ -358,8 +358,9 @@ class MicroweberInstaller
         }
 
         if ($this->databaseDriver == self::DATABASE_DRIVER_SQLITE) {
-            $this->databaseHost = 'localhost';
-            $this->databaseName = $this->path . '/storage/database.sqlite';
+          //  $this->databaseHost = 'localhost';
+            $this->databaseHost = $this->path . '/database/database.sqlite';
+            $this->databaseName = $this->path . '/database/database.sqlite';
         }
 
         $installArguments = [];

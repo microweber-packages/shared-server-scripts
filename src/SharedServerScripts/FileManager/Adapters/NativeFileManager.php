@@ -1,4 +1,5 @@
 <?php
+
 namespace MicroweberPackages\SharedServerScripts\FileManager\Adapters;
 
 use Mockery\Exception;
@@ -141,16 +142,30 @@ class NativeFileManager implements IFileManager
      */
     public function copyFolder($from, $to)
     {
-        mkdir($to, 0755);
+
         foreach (
             $iterator = new \RecursiveIteratorIterator(
                 new \RecursiveDirectoryIterator($from, \RecursiveDirectoryIterator::SKIP_DOTS),
                 \RecursiveIteratorIterator::SELF_FIRST) as $item
         ) {
             if ($item->isDir()) {
-                mkdir($to . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
+                if (!is_dir($to . DIRECTORY_SEPARATOR . $iterator->getSubPathname())) {
+                    // Create the directory if it does not exist
+                    mkdir($to . DIRECTORY_SEPARATOR . $iterator->getSubPathname(), 0755, true);
+                }
+
+
             } else {
-                copy($item, $to . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
+
+                if(!is_dir(dirname($to . DIRECTORY_SEPARATOR . $iterator->getSubPathname()))){
+                    // Create the parent directory if it does not exist
+                    mkdir(dirname($to . DIRECTORY_SEPARATOR . $iterator->getSubPathname()), 0755, true);
+                }
+
+                if (is_file($item)  and !is_dir($item)) {
+
+                    copy($item, $to . DIRECTORY_SEPARATOR . $iterator->getSubPathname());
+                }
             }
         }
     }
@@ -166,7 +181,7 @@ class NativeFileManager implements IFileManager
         try {
             $exec = symlink($target, $link);
         } catch (\Exception $e) {
-            throw new \Exception(json_encode(['args'=> func_get_args(),'message'=>$e->getMessage()], JSON_PRETTY_PRINT));
+            throw new \Exception(json_encode(['args' => func_get_args(), 'message' => $e->getMessage()], JSON_PRETTY_PRINT));
         }
 
         return $exec;
