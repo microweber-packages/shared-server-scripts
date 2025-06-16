@@ -171,8 +171,8 @@ class MicroweberDownloader implements IMicroweberDownloader
     public function getRelease()
     {
         if ($this->realeaseSource == self::DEV_RELEASE) {
-            $branch = 'dev';
-            //$branch = 'filament-unstable';
+           // $branch = 'dev';
+            $branch = 'filament-unstable';
             return [
                 'version' => 'Latest development version',
                 'composer_url' => 'http://updater.microweberapi.com/builds/' . $branch . '/composer.json',

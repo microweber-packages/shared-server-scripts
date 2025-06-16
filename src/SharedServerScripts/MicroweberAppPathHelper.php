@@ -61,7 +61,7 @@ class MicroweberAppPathHelper
      */
     public function isSymlink()
     {
-        return $this->fileManager->isLink($this->path.'/vendor');
+        return $this->fileManager->isLink($this->path . '/vendor');
     }
 
     /**
@@ -70,6 +70,10 @@ class MicroweberAppPathHelper
     public function isInstalled()
     {
         $configFile = $this->path . '/config/microweber.php';
+        if ($this->fileManager->fileExists($configFile)) {
+            return true;
+        }
+        $configFile = $this->path . '/.env';
         if ($this->fileManager->fileExists($configFile)) {
             return true;
         }
@@ -111,22 +115,65 @@ class MicroweberAppPathHelper
      */
     public function getSupportedModules()
     {
-        try {
-            $executeArtisan = $this->shellExecutor->executeCommand([
-                'php',
-                '-d memory_limit=512M',
-                $this->path . '/artisan',
-                'microweber:get-modules',
-            ]);
-            $decodeArtisanOutput = json_decode($executeArtisan, true);
-            if (!empty($decodeArtisanOutput)) {
-                return $decodeArtisanOutput;
-            }
-        } catch (\Exception $e) {
+        $modules = [];
+        $modulesPath = $this->path . '/userfiles/modules';
 
+        if (!$this->fileManager->isDir($modulesPath)) {
+
+            $modulesPath = $this->path . '/Modules';
         }
 
-        return [];
+        if (!$this->fileManager->isDir($modulesPath)) {
+            return [];
+        }
+
+
+        $scan = $this->fileManager->scanDir($modulesPath);
+        if (!empty($scan)) {
+            foreach ($scan as $dir) {
+                if ($dir == '.' || $dir == '..') {
+                    continue;
+                }
+                $name = $dir;
+                $fullDir = $modulesPath . '/' . $dir;
+                $moduleConfig = $fullDir . '/composer.json';
+                $moduleVersion = null;
+
+                if ($this->fileManager->fileExists($moduleConfig)) {
+
+                    $moduleConfigContent = $this->fileManager->fileGetContents($moduleConfig);
+                    $moduleConfigData = json_decode($moduleConfigContent, true);
+
+                    if (isset($moduleConfigData['version'])) {
+                        $moduleVersion = $moduleConfigData['version'];
+                    }
+
+                    if (isset($moduleConfigData['name'])) {
+                        $name = $moduleConfigData['name'];
+                    }
+                    if (isset($moduleConfigData['target-dir'])) {
+                        $dir = $moduleConfigData['target-dir'];
+                    }
+                } else {
+                    $moduleVersion = 'unknown';
+
+                }
+                $modules[] = [
+                    'name' => $name,
+                    'targetDir' => $dir,
+                    'version' => $moduleVersion,
+                ];
+            }
+        }
+        if (empty($modules)) {
+            return [];
+        }
+        // Sort modules by name
+        usort($modules, function ($a, $b) {
+            return strcmp($a['name'], $b['name']);
+        });
+        return $modules;
+
     }
 
     /**
@@ -135,59 +182,60 @@ class MicroweberAppPathHelper
     public function getSupportedTemplates()
     {
 
-        if (!$this->isInstalled()) {
 
-            $templates = [];
-            $templatePath = $this->path . '/userfiles/templates';
-            if (!$this->fileManager->isDir($templatePath)) {
-                return [];
-            }
+        $templates = [];
+        $templatePath = $this->path . '/userfiles/templates';
 
-            $scan = $this->fileManager->scanDir($templatePath);
-            if (!empty($scan)) {
-                foreach ($scan as $dir) {
-                    if ($dir == '.' || $dir == '..') {
-                        continue;
-                    }
-                    $fullDir = $templatePath . '/' . $dir;
-                    $templateConfig = $fullDir . '/config.php';
-                    $templateVersion = null;
-                    if ($this->fileManager->fileExists($templateConfig)) {
-                       ob_start();
-                      include $templateConfig;
-                      if (isset($config['version'])) {
-                          $templateVersion = $config['version'];
-                      }
-                      ob_get_clean();
-                    }
-                    $templates[] = [
-                      'name'=>ucfirst($dir),
-                      'targetDir'=>$dir,
-                      'version'=>$templateVersion,
-                    ];
+        if (!$this->fileManager->isDir($templatePath)) {
+            $templatePath = $this->path . '/Templates';
+        }
+
+        if (!$this->fileManager->isDir($templatePath)) {
+            return [];
+        }
+
+
+        $scan = $this->fileManager->scanDir($templatePath);
+        if (!empty($scan)) {
+            foreach ($scan as $dir) {
+                if ($dir == '.' || $dir == '..') {
+                    continue;
                 }
-            }
+                $name = $dir;
+                $fullDir = $templatePath . '/' . $dir;
+                $templateConfig = $fullDir . '/composer.json';
+                $templateVersion = null;
 
-            return $templates;
+                if ($this->fileManager->fileExists($templateConfig)) {
+
+                    $templateConfigContent = $this->fileManager->fileGetContents($templateConfig);
+                    $templateConfigData = json_decode($templateConfigContent, true);
+
+                    if (isset($templateConfigData['version'])) {
+                        $templateVersion = $templateConfigData['version'];
+                    }
+
+                    if (isset($templateConfigData['name'])) {
+                        $name = $templateConfigData['name'];
+                    }
+                    if (isset($templateConfigData['target-dir'])) {
+                        $dir = $templateConfigData['target-dir'];
+                    }
+                } else {
+                    $templateVersion = 'unknown';
+
+                }
+                $templates[] = [
+                    'name' => $name,
+                    'targetDir' => $dir,
+                    'version' => $templateVersion,
+                ];
+            }
         }
 
-        try {
-            $executeArtisan = $this->shellExecutor->executeCommand([
-                'php',
-                '-d memory_limit=512M',
-                $this->path . '/artisan',
-                'microweber:get-templates',
-            ]);
+        return $templates;
 
-            $decodeArtisanOutput = json_decode($executeArtisan, true);
-            if (!empty($decodeArtisanOutput)) {
-                return $decodeArtisanOutput;
-            }
-        } catch (\Exception $e) {
 
-        }
-
-        return [];
     }
 
     /**
@@ -195,46 +243,45 @@ class MicroweberAppPathHelper
      */
     public function getSupportedLanguages()
     {
-        if (!$this->isInstalled()) {
-            $langDir = $this->path . '/src/MicroweberPackages/Translation/resources/lang';
-            if (!$this->fileManager->isDir($langDir)) {
-                return [];
-            }
-            $languages = [
-                'en_US'=>'EN_US',
-                'bg_BG'=>'BG_BG',
-                'ar_SA'=>'AR_SA'
-            ];
-            $scan = $this->fileManager->scanDir($langDir);
-            if (!empty($scan)) {
-                foreach ($scan as $dir) {
-                    if ($dir == '.' || $dir == '..') {
-                        continue;
-                    }
-                    $languageAbr = str_replace('.json', false, $dir);
-                    $upperText = strtoupper($languageAbr);
-                    $languages[trim($languageAbr)] = $upperText;
+
+        $langDir = $this->path . '/src/MicroweberPackages/Translation/resources/lang';
+        if (!$this->fileManager->isDir($langDir)) {
+            return [];
+        }
+        $languages = [
+            'en_US' => 'EN_US',
+            'bg_BG' => 'BG_BG',
+            'ar_SA' => 'AR_SA'
+        ];
+        $scan = $this->fileManager->scanDir($langDir);
+        if (!empty($scan)) {
+            foreach ($scan as $dir) {
+                if ($dir == '.' || $dir == '..') {
+                    continue;
                 }
+                $languageAbr = str_replace('.json', false, $dir);
+                $upperText = strtoupper($languageAbr);
+                $languages[trim($languageAbr)] = $upperText;
             }
-
-            return $languages;
         }
 
-        try {
-            $executeArtisan = $this->shellExecutor->executeCommand([
-                'php',
-                '-d memory_limit=512M',
-                $this->path . '/artisan',
-                'microweber:get-languages',
-            ]);
+        return $languages;
 
-            $decodeArtisanOutput = json_decode($executeArtisan, true);
-            if (!empty($decodeArtisanOutput)) {
-                return $decodeArtisanOutput;
-            }
-        } catch (\Exception $e) {
-
-        }
+//        try {
+//            $executeArtisan = $this->shellExecutor->executeCommand([
+//                'php',
+//                '-d memory_limit=512M',
+//                $this->path . '/artisan',
+//                'microweber:get-languages',
+//            ]);
+//
+//            $decodeArtisanOutput = json_decode($executeArtisan, true);
+//            if (!empty($decodeArtisanOutput)) {
+//                return $decodeArtisanOutput;
+//            }
+//        } catch (\Exception $e) {
+//
+//        }
 
         return [];
     }
@@ -245,14 +292,14 @@ class MicroweberAppPathHelper
     public function enableAdminLoginWithToken()
     {
         try {
-              $executeArtisan = $this->shellExecutor->executeCommand([
-                  'php',
-                  '-d memory_limit=512M',
-                  $this->path . '/artisan',
-                  'microweber:module',
-                  'login-with-token',
-                  '1',
-              ]);
+            $executeArtisan = $this->shellExecutor->executeCommand([
+                'php',
+                '-d memory_limit=512M',
+                $this->path . '/artisan',
+                'microweber:module',
+                'login-with-token',
+                '1',
+            ]);
 
             return $executeArtisan;
 

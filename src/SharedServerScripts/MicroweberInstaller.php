@@ -363,17 +363,15 @@ class MicroweberInstaller
         }
 
 
-
-
         if ($this->type == self::TYPE_SYMLINK) {
             $this->_fixHtaccess();
         }
 
         if ($this->databaseDriver == self::DATABASE_DRIVER_SQLITE) {
-            $this->databaseHost = 'localhost';
+            // $this->databaseHost = 'localhost';
             //  $this->databaseHost = $this->path . '/database/database.sqlite';
             // $this->databaseHost =  'database/database.sqlite';
-            //  $this->databaseName = $this->path . '/database/database.sqlite';
+            $this->databaseName = $this->path . '/storage/database.sqlite';
         }
 
         $installArguments = [];
@@ -384,8 +382,12 @@ class MicroweberInstaller
         $installArguments[] = '--password=' . $this->adminPassword;
 
         // Database settings
-        $installArguments[] = '--db-host=' . $this->databaseHost;
-        $installArguments[] = '--db-name=' . $this->databaseName;
+        if ($this->databaseDriver == self::DATABASE_DRIVER_SQLITE) {
+            $installArguments[] = '--db-name=' . $this->databaseName;
+        } else {
+            $installArguments[] = '--db-host=' . $this->databaseHost;
+            $installArguments[] = '--db-name=' . $this->databaseName;
+        }
         $installArguments[] = '--db-username=' . $this->databaseUsername;
         $installArguments[] = '--db-password=' . $this->databasePassword;
         $installArguments[] = '--db-driver=' . $this->databaseDriver;
