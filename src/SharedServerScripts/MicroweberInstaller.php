@@ -299,8 +299,6 @@ class MicroweberInstaller
         $this->_prepairPathFolder();
 
 
-
-
         // First we will make a directories
         foreach ($this->_getDirsToMake() as $dir) {
             $this->fileManager->mkdir($this->path . '/' . $dir, '0755', true);
@@ -346,21 +344,36 @@ class MicroweberInstaller
             $sourceFile = $this->sourcePath . '/' . $file;
             $targetFile = $this->path . '/' . $file;
 
-            if( !$this->fileManager->isFile($sourceFile)) {
+            if (!$this->fileManager->isFile($sourceFile)) {
                 continue;
             }
 
             $this->fileManager->copy($sourceFile, $targetFile);
         }
 
+        foreach ($this->_getFilesForCopyWithTarget() as $sourceFile => $targetFile) {
+            $sourceFile = $this->sourcePath . '/' . $sourceFile;
+            $targetFile = $this->path . '/' . $targetFile;
+
+            if (!$this->fileManager->isFile($sourceFile)) {
+                continue;
+            }
+
+            $this->fileManager->copy($sourceFile, $targetFile);
+        }
+
+
+
+
         if ($this->type == self::TYPE_SYMLINK) {
             $this->_fixHtaccess();
         }
 
         if ($this->databaseDriver == self::DATABASE_DRIVER_SQLITE) {
-          //  $this->databaseHost = 'localhost';
-            $this->databaseHost = $this->path . '/database/database.sqlite';
-            $this->databaseName = $this->path . '/database/database.sqlite';
+            $this->databaseHost = 'localhost';
+            //  $this->databaseHost = $this->path . '/database/database.sqlite';
+            // $this->databaseHost =  'database/database.sqlite';
+            //  $this->databaseName = $this->path . '/database/database.sqlite';
         }
 
         $installArguments = [];
@@ -395,10 +408,11 @@ class MicroweberInstaller
         ], $installArguments);
 
 
+        //  dd(implode(' ', $artisanCommand));
+
         try {
 
             $this->_chownFolders();
-
 
 
             $executeArtisan = $this->shellExecutor->executeCommand($artisanCommand, $this->path, [
@@ -543,6 +557,14 @@ class MicroweberInstaller
         return $dirs;
     }
 
+    public function _getFilesForCopyWithTarget()
+    {
+        $files = [];
+        $files['.env.testing'] = '.env';
+        return $files;
+    }
+
+
     public function _getFilesForSymlinking()
     {
 
@@ -638,7 +660,7 @@ class MicroweberInstaller
         // Index
         $files[] = 'phpunit.xml';
 
-        if($this->isMicroweberV3()) {
+        if ($this->isMicroweberV3()) {
             $files[] = 'public/index.php';
             $files[] = 'public/favicon.ico';
             $files[] = 'public/.htaccess';
