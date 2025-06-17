@@ -2,7 +2,6 @@
 
 namespace MicroweberPackages\SharedServerScripts\FileManager\Adapters;
 
-use Mockery\Exception;
 
 class NativeFileManager implements IFileManager
 {
