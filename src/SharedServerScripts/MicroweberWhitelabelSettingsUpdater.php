@@ -6,42 +6,10 @@ use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 
 class MicroweberWhitelabelSettingsUpdater {
 
-    /**
-     * @var
-     */
-    public $path;
-
-    /**
-     * @param $adapter
-     * @return void
-     */
-    public function setFileManager($adapter)
-    {
-        $this->fileManager = $adapter;
-    }
-
-    /**
-     * @param $adapter
-     * @return void
-     */
-    public function setShellExecutor($adapter)
-    {
-        $this->shellExecutor = $adapter;
-    }
-
-    /**
-     * @param $path
-     * @return void
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
-    }
-
+    use MicroweberFileOperationsTrait;
 
     public function __construct() {
-        $this->fileManager = new NativeFileManager();
-        $this->shellExecutor = new NativeShellExecutor();
+        $this->initializeAdapters();
     }
 
     public function apply($settings)

@@ -18,11 +18,13 @@ class NativeFileManager implements IFileManager
 
     /**
      * @param $dir
+     * @param int $permissions
+     * @param bool $recursive
      * @return bool
      */
-    public function mkdir($dir)
+    public function mkdir($dir, $permissions = 0755, $recursive = true)
     {
-        return mkdir($dir);
+        return mkdir($dir, $permissions, $recursive);
     }
 
     /**

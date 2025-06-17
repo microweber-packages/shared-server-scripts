@@ -6,6 +6,8 @@ use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 
 class MicroweberWhitelabelWebsiteApply {
 
+    use MicroweberFileOperationsTrait;
+
     /**
      * Web path of Website
      * @var
@@ -17,24 +19,6 @@ class MicroweberWhitelabelWebsiteApply {
      * @var
      */
     public $sharedPath;
-
-    /**
-     * @param $adapter
-     * @return void
-     */
-    public function setFileManager($adapter)
-    {
-        $this->fileManager = $adapter;
-    }
-
-    /**
-     * @param $adapter
-     * @return void
-     */
-    public function setShellExecutor($adapter)
-    {
-        $this->shellExecutor = $adapter;
-    }
 
     /**
      * @param $path
@@ -56,8 +40,7 @@ class MicroweberWhitelabelWebsiteApply {
     }
 
     public function __construct() {
-        $this->fileManager = new NativeFileManager();
-        $this->shellExecutor = new NativeShellExecutor();
+        $this->initializeAdapters();
     }
 
     public function apply()

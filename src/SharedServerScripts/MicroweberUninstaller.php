@@ -6,73 +6,68 @@ use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManage
 
 class MicroweberUninstaller {
 
-    /**
-     * @var
-     */
-    public $path;
-
-    /**
-     * @var NativeFileManager
-     */
-    public $fileManager;
+    use MicroweberFileOperationsTrait;
 
     public function __construct()
     {
-        $this->fileManager = new NativeFileManager();
-    }
-
-    /**
-     * @param $path
-     * @return void
-     */
-    public function setPath($path)
-    {
-        $this->path = $path;
-    }
-
-    /**
-     * @param $adapter
-     * @return void
-     */
-    public function setFileManager($adapter)
-    {
-        $this->fileManager = $adapter;
+        $this->initializeAdapters();
     }
 
 
     public function run()
     {
         $deletedFiles = [];
+        $errors = [];
 
-        $files = $this->_getFilesForDelete();
-
+        // Delete files
+        $files = $this->getFilesForDelete();
         foreach ($files as $file) {
             $deleteFile = $this->path . DIRECTORY_SEPARATOR . $file;
-            if ($this->fileManager->isFile($deleteFile)) {
-                $this->fileManager->unlink($deleteFile);
-                $deletedFiles[] = $file;
+            try {
+                if ($this->fileManager->isFile($deleteFile)) {
+                    $this->fileManager->unlink($deleteFile);
+                    $deletedFiles[] = $file;
+                }
+            } catch (\Exception $e) {
+                $errors[] = "Failed to delete file {$file}: " . $e->getMessage();
             }
         }
 
-        $dirs = $this->_getDirsForDelete();
+        // Delete directories
+        $dirs = $this->getDirsForDelete();
         foreach ($dirs as $dir) {
             $deleteDir = $this->path . DIRECTORY_SEPARATOR . $dir;
-            if ($this->fileManager->isDir($deleteDir)) {
-                if ($this->fileManager->isLink($deleteDir)) {
-                    $this->fileManager->unlink($deleteDir);
-                    $deletedFiles[] = $file;
-                    continue;
+            try {
+                if ($this->fileManager->isDir($deleteDir)) {
+                    if ($this->fileManager->isLink($deleteDir)) {
+                        $this->fileManager->unlink($deleteDir);
+                    } else {
+                        $this->fileManager->rmdirRecursive($deleteDir);
+                    }
+                    $deletedFiles[] = $dir;
                 }
-                $this->fileManager->rmdirRecursive($deleteDir);
-                $deletedFiles[] = $file;
+            } catch (\Exception $e) {
+                $errors[] = "Failed to delete directory {$dir}: " . $e->getMessage();
             }
         }
 
-        return ['done'=>true,'deleted'=>$deletedFiles];
+        return $this->buildResult(
+            empty($errors), 
+            empty($errors) ? 'Uninstallation completed successfully' : 'Uninstallation completed with errors',
+            [
+                'done' => true,
+                'deleted' => $deletedFiles,
+                'errors' => $errors
+            ]
+        );
     }
 
-
-    private function _getDirsForDelete() {
+    /**
+     * Get directories that need to be deleted during uninstallation
+     * 
+     * @return array
+     */
+    private function getDirsForDelete() {
 
         $dirs = [];
         $dirs[] = 'bootstrap';
@@ -87,7 +82,12 @@ class MicroweberUninstaller {
         return $dirs;
     }
 
-    private function _getFilesForDelete() {
+    /**
+     * Get files that need to be deleted during uninstallation
+     * 
+     * @return array
+     */
+    private function getFilesForDelete() {
 
         $files = [];
         $files[] = 'version.txt';

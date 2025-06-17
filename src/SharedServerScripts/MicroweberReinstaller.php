@@ -21,7 +21,7 @@ class MicroweberReinstaller extends MicroweberInstaller {
     {
         $this->enableChownAfterInstall();
 
-        foreach ($this->_getFilesForSymlinking() as $fileOrFolder) {
+        foreach ($this->getFilesForSymlinking() as $fileOrFolder) {
 
             $sourceDirOrFile = $this->sourcePath . '/' . $fileOrFolder;
             $targetDirOrFile = $this->path . '/' . $fileOrFolder;
@@ -31,13 +31,7 @@ class MicroweberReinstaller extends MicroweberInstaller {
                 continue;
             }
 
-            if ($this->fileManager->isDir($targetDirOrFile)) {
-                $this->fileManager->rmdirRecursive($targetDirOrFile);
-            }
-
-            if ($this->fileManager->isFile($targetDirOrFile)) {
-                $this->fileManager->unlink($targetDirOrFile);
-            }
+            $this->removeFileOrFolder($targetDirOrFile);
 
             // Create symlink
             $this->fileManager->symlink($sourceDirOrFile, $targetDirOrFile);
@@ -52,50 +46,32 @@ class MicroweberReinstaller extends MicroweberInstaller {
     {
         $this->enableChownAfterInstall();
 
-        foreach ($this->_getFilesForSymlinking() as $fileOrFolder) {
-
-
-
+        foreach ($this->getFilesForSymlinking() as $fileOrFolder) {
             $sourceDirOrFile = $this->sourcePath . '/' . $fileOrFolder;
 
-            if(!$this->fileManager->isDir($sourceDirOrFile) && !$this->fileManager->isFile($sourceDirOrFile)) {
+            if(!$this->sourceExists($sourceDirOrFile)) {
                 continue; // Skip if source is not a directory or file
             }
-
-
 
             $targetDirOrFile = $this->path . '/' . $fileOrFolder;
 
-            // Delete symlink
-            if ($this->fileManager->isLink($targetDirOrFile)) {
-                $this->fileManager->unlink($targetDirOrFile);
-            }
+            // Remove existing target
+            $this->removeFileOrFolder($targetDirOrFile);
 
-            // Delete file
-            if ($this->fileManager->isFile($targetDirOrFile)) {
-                $this->fileManager->unlink($targetDirOrFile);
-            }
-
-            // Delete folder
+            // Copy from source
             if ($this->fileManager->isDir($sourceDirOrFile)) {
-                if ($this->fileManager->isDir($targetDirOrFile)) {
-                    $this->fileManager->rmdirRecursive($targetDirOrFile);
-                }
                 $this->fileManager->copyFolder($sourceDirOrFile, $targetDirOrFile);
             }
-
         }
 
         // And then we will copy files
-        foreach ($this->_getFilesForCopy() as $file) {
-
+        foreach ($this->getFilesForCopy() as $file) {
             $sourceDirOrFile = $this->sourcePath .'/'. $file;
             $targetDirOrFile = $this->path .'/'. $file;
 
-            if(!$this->fileManager->isDir($sourceDirOrFile) && !$this->fileManager->isFile($sourceDirOrFile)) {
+            if(!$this->sourceExists($sourceDirOrFile)) {
                 continue; // Skip if source is not a directory or file
             }
-
 
             if ($this->fileManager->isFile($targetDirOrFile)) {
                 unlink($targetDirOrFile);
@@ -111,56 +87,7 @@ class MicroweberReinstaller extends MicroweberInstaller {
 
     public function addMissingConfigFiles()
     {
-        $sourceDirOfConfigs = [];
-        $sourceDirOfConfigsList = $this->fileManager->scanDir($this->sourcePath . '/config');
-        if (!empty($sourceDirOfConfigsList)) {
-            foreach ($sourceDirOfConfigsList as $configFile) {
-                if ($configFile == '.' || $configFile == '..') {
-                    continue;
-                }
-                $configFileExt = $this->fileManager->fileExtension($this->sourcePath . '/config/'.$configFile);
-                if ($configFileExt !== 'php') {
-                    continue;
-                }
-
-                $sourceDirOfConfigs[] = $configFile;
-            }
-        }
-
-        $targetDirOfConfigs = [];
-        $targetDirOfConfigsList = $this->fileManager->scanDir($this->path . '/config');
-        if (!empty($targetDirOfConfigsList)) {
-            foreach ($targetDirOfConfigsList as $targetConfigFile) {
-                if ($targetConfigFile == '.' || $targetConfigFile == '..') {
-                    continue;
-                }
-                $targetConfigFileExt = $this->fileManager->fileExtension($this->path . '/config/'.$targetConfigFile);
-                if ($targetConfigFileExt !== 'php') {
-                    continue;
-                }
-                $targetDirOfConfigs[] = $targetConfigFile;
-            }
-        }
-
-        $missingConfigs = [];
-        foreach ($sourceDirOfConfigs as $sourceConfig) {
-            if (!in_array($sourceConfig, $targetDirOfConfigs)) {
-                $missingConfigs[] = $sourceConfig;
-            }
-        }
-
-        if (!empty($missingConfigs)) {
-            foreach ($missingConfigs as $missingConfig) {
-
-                $sourceConfigFile = $this->sourcePath . '/config/'.$missingConfig;
-                $targetConfigFile = $this->path .'/config/' . $missingConfig;
-
-                if (!$this->fileManager->fileExists($targetConfigFile)) {
-                    $this->fileManager->copy($sourceConfigFile, $targetConfigFile);
-                }
-            }
-        }
-
+        $this->addMissingConfigFiles('config', 'php');
     }
 
 }
