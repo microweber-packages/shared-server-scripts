@@ -78,11 +78,11 @@ class MicroweberEnvFileWebsiteApply
         }
 
         $fileManager = $this->getFileManager();
-        
+
         // Read existing .env file content or create empty content
         $existingContent = '';
         if ($fileManager->fileExists($this->envFilePath)) {
-            $existingContent = $fileManager->getFileContents($this->envFilePath);
+            $existingContent = $fileManager->fileGetContents($this->envFilePath);
         }
 
         // Generate the MW environment variables block
@@ -92,7 +92,7 @@ class MicroweberEnvFileWebsiteApply
         $newContent = $this->updateEnvContent($existingContent, $mwEnvBlock);
 
         // Write the updated content back to the file
-        return $fileManager->putFileContents($this->envFilePath, $newContent);
+        return $fileManager->filePutContents($this->envFilePath, $newContent);
     }
 
     /**
@@ -103,15 +103,15 @@ class MicroweberEnvFileWebsiteApply
     private function generateMwEnvBlock($envVars)
     {
         $block = self::MW_ENV_START_SEPARATOR . PHP_EOL;
-        
+
         foreach ($envVars as $key => $value) {
             // Escape quotes in values
             $escapedValue = $this->escapeEnvValue($value);
             $block .= $key . '=' . $escapedValue . PHP_EOL;
         }
-        
+
         $block .= self::MW_ENV_END_SEPARATOR;
-        
+
         return $block;
     }
 
@@ -126,7 +126,7 @@ class MicroweberEnvFileWebsiteApply
         if (preg_match('/[\s"\'#]/', $value)) {
             return '"' . str_replace('"', '\\"', $value) . '"';
         }
-        
+
         return $value;
     }
 
@@ -145,11 +145,11 @@ class MicroweberEnvFileWebsiteApply
             // Separators found - replace existing block
             $beforeBlock = substr($existingContent, 0, $startPos);
             $afterBlock = substr($existingContent, $endPos + strlen(self::MW_ENV_END_SEPARATOR));
-            
+
             // Remove trailing newlines from before block and leading newlines from after block
             $beforeBlock = rtrim($beforeBlock);
             $afterBlock = ltrim($afterBlock, "\r\n");
-            
+
             $newContent = $beforeBlock;
             if (!empty($beforeBlock)) {
                 $newContent .= PHP_EOL . PHP_EOL;
@@ -158,19 +158,19 @@ class MicroweberEnvFileWebsiteApply
             if (!empty($afterBlock)) {
                 $newContent .= PHP_EOL . PHP_EOL . $afterBlock;
             }
-            
+
             return $newContent;
         } else {
             // Separators not found - add new block
             $newContent = $existingContent;
-            
+
             // Add spacing if file already has content
             if (!empty(trim($existingContent))) {
                 $newContent = rtrim($newContent) . PHP_EOL . PHP_EOL;
             }
-            
+
             $newContent .= $mwEnvBlock;
-            
+
             return $newContent;
         }
     }
@@ -186,12 +186,13 @@ class MicroweberEnvFileWebsiteApply
         }
 
         $fileManager = $this->getFileManager();
-        
+
         if (!$fileManager->fileExists($this->envFilePath)) {
             return true; // Nothing to remove
         }
 
-        $existingContent = $fileManager->getFileContents($this->envFilePath);
+
+        $existingContent = $fileManager->fileGetContents($this->envFilePath);
         $startPos = strpos($existingContent, self::MW_ENV_START_SEPARATOR);
         $endPos = strpos($existingContent, self::MW_ENV_END_SEPARATOR);
 
@@ -199,18 +200,18 @@ class MicroweberEnvFileWebsiteApply
             // Remove the MW block
             $beforeBlock = substr($existingContent, 0, $startPos);
             $afterBlock = substr($existingContent, $endPos + strlen(self::MW_ENV_END_SEPARATOR));
-            
+
             // Clean up extra newlines
             $beforeBlock = rtrim($beforeBlock);
             $afterBlock = ltrim($afterBlock, "\r\n");
-            
+
             $newContent = $beforeBlock;
             if (!empty($beforeBlock) && !empty($afterBlock)) {
                 $newContent .= PHP_EOL . PHP_EOL;
             }
             $newContent .= $afterBlock;
-            
-            return $fileManager->putFileContents($this->envFilePath, $newContent);
+
+            return $fileManager->filePutContents($this->envFilePath, $newContent);
         }
 
         return true; // Nothing to remove
@@ -227,21 +228,21 @@ class MicroweberEnvFileWebsiteApply
         }
 
         $fileManager = $this->getFileManager();
-        
+
         if (!$fileManager->fileExists($this->envFilePath)) {
             return [];
         }
 
-        $existingContent = $fileManager->getFileContents($this->envFilePath);
+        $existingContent = $fileManager->fileGetContents($this->envFilePath);
         $startPos = strpos($existingContent, self::MW_ENV_START_SEPARATOR);
         $endPos = strpos($existingContent, self::MW_ENV_END_SEPARATOR);
 
         if ($startPos !== false && $endPos !== false) {
-            $mwBlock = substr($existingContent, 
-                $startPos + strlen(self::MW_ENV_START_SEPARATOR), 
+            $mwBlock = substr($existingContent,
+                $startPos + strlen(self::MW_ENV_START_SEPARATOR),
                 $endPos - $startPos - strlen(self::MW_ENV_START_SEPARATOR)
             );
-            
+
             return $this->parseEnvVars($mwBlock);
         }
 
@@ -257,27 +258,27 @@ class MicroweberEnvFileWebsiteApply
     {
         $vars = [];
         $lines = explode("\n", $envBlock);
-        
+
         foreach ($lines as $line) {
             $line = trim($line);
             if (empty($line) || strpos($line, '=') === false) {
                 continue;
             }
-            
+
             list($key, $value) = explode('=', $line, 2);
             $key = trim($key);
             $value = trim($value);
-            
+
             // Remove quotes if present
             if ((substr($value, 0, 1) === '"' && substr($value, -1) === '"') ||
                 (substr($value, 0, 1) === "'" && substr($value, -1) === "'")) {
                 $value = substr($value, 1, -1);
                 $value = stripcslashes($value);
             }
-            
+
             $vars[$key] = $value;
         }
-        
+
         return $vars;
     }
 }

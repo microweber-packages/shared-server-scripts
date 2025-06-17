@@ -90,6 +90,12 @@ class MicroweberInstaller
      */
     protected $phpSbin = 'php';
 
+
+    /**
+     * @var string
+     */
+    protected $appUrl = '';
+
     /**
      * @param $logger
      * @return void
@@ -334,6 +340,22 @@ class MicroweberInstaller
             $installArguments[] = '--language=' . trim($this->language);
         }
 
+
+        if ($this->appUrl) {
+
+            //add https
+            if (strpos($this->appUrl, 'https://') === false && strpos($this->appUrl, 'http://') === false) {
+                $this->appUrl = 'https://' . $this->appUrl;
+            }
+
+            //replace http with https if it is set
+            if (strpos($this->appUrl, 'http://') === 0) {
+                $this->appUrl = 'https://' . substr($this->appUrl, 7);
+            }
+
+            $installArguments[] = '--app-url=' . trim($this->appUrl);
+        }
+
         $installArguments[] = '--db-prefix=site_';
 
         if (!empty($this->template)) {
@@ -352,5 +374,15 @@ class MicroweberInstaller
                 $this->executeChownScript($chownUser);
             }
         }
+    }
+
+    public function getAppUrl(): string
+    {
+        return $this->appUrl;
+    }
+
+    public function setAppUrl(string $appUrl): void
+    {
+        $this->appUrl = $appUrl;
     }
 }

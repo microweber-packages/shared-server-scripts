@@ -7,7 +7,7 @@ use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 
 /**
  * Trait MicroweberFileOperationsTrait
- * 
+ *
  * Shared functionality for Microweber installer, reinstaller, and uninstaller classes.
  * Provides common file operations, path management, and adapter handling.
  */
@@ -80,7 +80,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Check if the source directory contains Microweber v3 structure
-     * 
+     *
      * @return bool
      */
     protected function isMicroweberV3()
@@ -88,13 +88,13 @@ trait MicroweberFileOperationsTrait
         if (!$this->sourcePath) {
             return false;
         }
-        
+
         return $this->fileManager->isDir($this->sourcePath . '/Templates');
     }
 
     /**
      * Get directories that need to be created during installation
-     * 
+     *
      * @return array
      */
     protected function getDirsToMake()
@@ -134,7 +134,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Get directories that need to be copied during installation
-     * 
+     *
      * @return array
      */
     protected function getDirsToCopy()
@@ -155,7 +155,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Get files that should be symlinked or copied for core functionality
-     * 
+     *
      * @return array
      */
     protected function getFilesForSymlinking()
@@ -192,7 +192,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Add Microweber v2 files to the files array
-     * 
+     *
      * @param array &$files
      * @param string $basePath
      */
@@ -215,7 +215,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Add Microweber v3 files to the files array
-     * 
+     *
      * @param array &$files
      * @param string $basePath
      */
@@ -238,7 +238,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Get files that need to be copied (not symlinked)
-     * 
+     *
      * @return array
      */
     protected function getFilesForCopy()
@@ -271,7 +271,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Get files that need to be copied with specific target names
-     * 
+     *
      * @return array
      */
     protected function getFilesForCopyWithTarget()
@@ -283,7 +283,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Create or copy a file/folder from source to target
-     * 
+     *
      * @param string $sourceItem
      * @param string $targetItem
      * @param bool $isSymlink
@@ -307,7 +307,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Remove a file or directory (including symlinks)
-     * 
+     *
      * @param string $target
      */
     protected function removeFileOrFolder($target)
@@ -322,7 +322,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Create directories with proper permissions
-     * 
+     *
      * @param array $directories
      */
     protected function createDirectories($directories)
@@ -337,7 +337,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Copy directories from source to target
-     * 
+     *
      * @param array $directories
      */
     protected function copyDirectories($directories)
@@ -356,7 +356,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Copy files from source to target
-     * 
+     *
      * @param array $files
      */
     protected function copyFiles($files)
@@ -375,7 +375,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Copy files with custom target names
-     * 
+     *
      * @param array $filesWithTargets
      */
     protected function copyFilesWithTargets($filesWithTargets)
@@ -398,7 +398,7 @@ trait MicroweberFileOperationsTrait
         try {
             $existingFiles = [];
             $scanResult = $this->fileManager->scanDir($this->path);
-            
+
             if ($scanResult) {
                 foreach ($scanResult as $file) {
                     if ($file == '.' || $file == '..') {
@@ -414,7 +414,7 @@ trait MicroweberFileOperationsTrait
                 if (!$this->fileManager->isDir($backupMainFilesPath)) {
                     $this->fileManager->mkdir($backupMainFilesPath, 0755, true);
                 }
-                
+
                 $backupFilesPath = $backupMainFilesPath . 'backup-' . date('Y-m-d-H-i-s');
                 if (!$this->fileManager->isDir($backupFilesPath)) {
                     $this->fileManager->mkdir($backupFilesPath, 0755, true);
@@ -435,7 +435,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Validate that source and target paths exist and are writable
-     * 
+     *
      * @throws \Exception
      */
     protected function validatePaths()
@@ -463,7 +463,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Check if source exists before processing
-     * 
+     *
      * @param string $sourcePath
      * @return bool
      */
@@ -474,7 +474,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Generate a random password
-     * 
+     *
      * @param int $length
      * @param bool $complex
      * @return string
@@ -507,7 +507,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Execute file ownership change script
-     * 
+     *
      * @param string $chownUser
      * @return string|null
      */
@@ -528,7 +528,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Get the path to a shell script
-     * 
+     *
      * @param string $scriptName
      * @return string
      */
@@ -539,7 +539,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Get file ownership information
-     * 
+     *
      * @param string $file
      * @return string|null
      */
@@ -562,7 +562,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Fix htaccess file for symlink installations
-     * 
+     *
      * @return bool
      */
     protected function fixHtaccessForSymlink()
@@ -575,7 +575,7 @@ trait MicroweberFileOperationsTrait
 
             $content = $this->fileManager->fileGetContents($htaccessPath);
             $content = str_replace('-MultiViews -Indexes', 'FollowSymLinks', $content);
-            
+
             return $this->fileManager->filePutContents($htaccessPath, $content) !== false;
         } catch (\Exception $e) {
             return false;
@@ -584,7 +584,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Scan directory and filter out system entries
-     * 
+     *
      * @param string $dirPath
      * @param string $extension Filter by file extension (optional)
      * @return array
@@ -618,7 +618,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Add missing configuration files from source to target
-     * 
+     *
      * @param string $configType Type of config (e.g., 'config', 'storage')
      * @param string $extension File extension to filter by
      */
@@ -644,7 +644,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Log operation result
-     * 
+     *
      * @param string $operation
      * @param bool $success
      * @param string $message
@@ -658,7 +658,7 @@ trait MicroweberFileOperationsTrait
                 'message' => $message,
                 'timestamp' => date('Y-m-d H:i:s')
             ];
-            
+
             // Assuming logger has a log method
             if (method_exists($this->logger, 'log')) {
                 $this->logger->log($success ? 'info' : 'error', json_encode($logData));
@@ -668,7 +668,7 @@ trait MicroweberFileOperationsTrait
 
     /**
      * Build operation result array
-     * 
+     *
      * @param bool $success
      * @param string $message
      * @param array $data Additional data
@@ -683,5 +683,16 @@ trait MicroweberFileOperationsTrait
         ];
 
         return array_merge($result, $data);
+    }
+
+
+    public function getFileManager()
+    {
+        if(!$this->fileManager) {
+            $this->initializeAdapters();
+        }
+
+        return $this->fileManager;
+
     }
 }
