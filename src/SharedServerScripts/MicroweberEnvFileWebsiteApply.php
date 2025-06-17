@@ -30,12 +30,12 @@ class MicroweberEnvFileWebsiteApply
     /**
      * Start separator for MW environment variables
      */
-    const MW_ENV_START_SEPARATOR = '### MW ENV VARS APPLY ###';
+    const MW_ENV_START_SEPARATOR = '### MW_ENV_VARS_APPLY ###';
 
     /**
      * End separator for MW environment variables
      */
-    const MW_ENV_END_SEPARATOR = '### END MW ENV VARS APPLY ###';
+    const MW_ENV_END_SEPARATOR = '### END_MW_ENV_VARS_APPLY ###';
 
     /**
      * @param string $path
