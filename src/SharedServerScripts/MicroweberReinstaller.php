@@ -85,9 +85,6 @@ class MicroweberReinstaller extends MicroweberInstaller {
         $this->_chownFolders();
     }
 
-    public function addMissingConfigFiles()
-    {
-        $this->addMissingConfigFiles('config', 'php');
-    }
+
 
 }
