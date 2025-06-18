@@ -1,12 +1,15 @@
 <?php
+
 namespace MicroweberPackages\SharedServerScripts;
 
+use Illuminate\Support\Str;
 use MicroweberPackages\ComposerClient\Client;
 use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
 use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
 use MicroweberPackages\SharedServerScripts\Shell\ShellExecutor;
 
-class MicroweberModuleConnectorsDownloader {
+class MicroweberModuleConnectorsDownloader
+{
 
     /**
      * @var NativeFileManager
@@ -27,7 +30,8 @@ class MicroweberModuleConnectorsDownloader {
      * @param $fileManagerAdapter
      * @param $shellExecutorAdapter
      */
-    public function __construct() {
+    public function __construct()
+    {
         $this->fileManager = new NativeFileManager();
         $this->shellExecutor = new NativeShellExecutor();
         $this->composerClient = new Client();
@@ -91,7 +95,12 @@ class MicroweberModuleConnectorsDownloader {
 
         $downloaded = [];
         foreach ($modules as $module) {
-            $downloadToPath = $target . DIRECTORY_SEPARATOR . $module['target-dir'] . DIRECTORY_SEPARATOR;
+            $nameLast = explode('/', $module['name']);
+            $nameLast = end($nameLast);
+            $dir = $module['target-dir'] ?? Str::studly($nameLast);
+
+
+            $downloadToPath = $target . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR;
             $downloaded[] = $this->downloadModule($module['dist']['url'], $downloadToPath);
         }
 
@@ -121,7 +130,7 @@ class MicroweberModuleConnectorsDownloader {
     public function _getModulesFromComposer()
     {
         $modules = [];
-        foreach ($this->composerClient->search() as $packageName=>$packageVersions) {
+        foreach ($this->composerClient->search() as $packageName => $packageVersions) {
             foreach ($packageVersions as $packageVersion) {
                 if ($packageVersion['type'] !== 'microweber-module') {
                     continue;

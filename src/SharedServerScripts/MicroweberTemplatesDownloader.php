@@ -1,6 +1,7 @@
 <?php
 namespace MicroweberPackages\SharedServerScripts;
 
+use Illuminate\Support\Str;
 use MicroweberPackages\ComposerClient\Client;
 use MicroweberPackages\SharedServerScripts\FileManager\Adapters\NativeFileManager;
 use MicroweberPackages\SharedServerScripts\Shell\Adapters\NativeShellExecutor;
@@ -91,7 +92,13 @@ class MicroweberTemplatesDownloader {
 
         $downloaded = [];
         foreach ($templates as $template) {
-            $downloadToPath = $target . DIRECTORY_SEPARATOR . $template['target-dir'] . DIRECTORY_SEPARATOR;
+
+            $nameLast = explode('/', $template['name']);
+            $nameLast = end($nameLast);
+            $dir = $template['target-dir'] ?? Str::studly($nameLast);
+
+
+            $downloadToPath = $target . DIRECTORY_SEPARATOR . $dir . DIRECTORY_SEPARATOR;
             $downloaded[] = $this->downloadTemplate($template['dist']['url'], $downloadToPath);
         }
 
