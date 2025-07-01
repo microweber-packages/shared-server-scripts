@@ -83,7 +83,7 @@ trait MicroweberFileOperationsTrait
      *
      * @return bool
      */
-    protected function isMicroweberV3()
+    public function isMicroweberV3()
     {
         if (!$this->sourcePath) {
             return false;
@@ -97,7 +97,7 @@ trait MicroweberFileOperationsTrait
      *
      * @return array
      */
-    protected function getDirsToMake()
+    public function getDirsToMake()
     {
         $dirs = [];
 
@@ -315,7 +315,8 @@ trait MicroweberFileOperationsTrait
         if ($this->fileManager->isLink($target)) {
             $this->fileManager->unlink($target);
         } else if ($this->fileManager->isDir($target)) {
-            $this->fileManager->rmdirRecursive($target);        } else if ($this->fileManager->isFile($target)) {
+            $this->fileManager->rmdirRecursive($target);
+        } else if ($this->fileManager->isFile($target)) {
             $this->fileManager->unlink($target);
         }
     }
@@ -386,7 +387,8 @@ trait MicroweberFileOperationsTrait
 
             if (!$this->fileManager->isFile($sourceFilePath)) {
                 continue;
-            }            $this->fileManager->copy($sourceFilePath, $targetFilePath);
+            }
+            $this->fileManager->copy($sourceFilePath, $targetFilePath);
         }
     }
 
@@ -446,7 +448,8 @@ trait MicroweberFileOperationsTrait
 
         if (!$this->fileManager->isDir(dirname($this->path))) {
             throw new \Exception('Parent directory of target path does not exist: ' . dirname($this->path));
-        }        if (!$this->fileManager->isWritable(dirname($this->path))) {
+        }
+        if (!$this->fileManager->isWritable(dirname($this->path))) {
             throw new \Exception('Parent directory of target path is not writable: ' . dirname($this->path));
         }
     }
@@ -502,7 +505,8 @@ trait MicroweberFileOperationsTrait
             }
 
             shuffle($pass);
-        }        return implode($pass);
+        }
+        return implode($pass);
     }
 
     /**
@@ -688,7 +692,7 @@ trait MicroweberFileOperationsTrait
 
     public function getFileManager()
     {
-        if(!$this->fileManager) {
+        if (!$this->fileManager) {
             $this->initializeAdapters();
         }
 
